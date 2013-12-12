@@ -1,0 +1,11 @@
+# Emacs temp files
+*~
+
+# Mac OSX
+.DS_Store
+
+# waf build system
+.waf*
+.lock*
+build/
+waf-tools/*.pyc
