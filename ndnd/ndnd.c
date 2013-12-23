@@ -45,6 +45,8 @@
 #include <sys/un.h>
 #include <netinet/in.h>
 
+#include "../tlv-hack/tlv-hack.h"
+
 #if defined(NEED_GETADDRINFO_COMPAT)
     #include "getaddrinfo.h"
     #include "dummyin6.h"
@@ -5033,21 +5035,54 @@ process_input(struct ndnd_handle *h, int fd)
             ndnd_stats_handle_http_connection(h, face);
             return;
         }
-        dres = ndn_skeleton_decode(d, buf, res);
-        while (d->state == 0) {
-            process_input_message(h, source,
-                                  face->inbuf->buf + msgstart,
-                                  d->index - msgstart,
-                                  (face->flags & NDN_FACE_LOCAL) != 0);
-            msgstart = d->index;
-            if (msgstart == face->inbuf->length) {
+        if (buf[0] == 0 || // TLV's Interest
+            buf[1] == 1)   // TLV's Data
+          {
+            // TLV-hack begin
+            struct ndn_charbuf *msg;
+            ssize_t length;
+
+            msg = charbuf_obtain(h);
+            length = tlv_to_ndnb(h, buf, res, msg);
+
+            while (length > 0) {
+              process_input_message(h, source,
+                                    msg->buf,
+                                    msg->length,
+                                    (face->flags & NDN_FACE_LOCAL) != 0);
+              ndn_charbuf_reset(msg);
+
+              msgstart += length;
+              if (msgstart == face->inbuf->length) {
                 face->inbuf->length = 0;
                 return;
+              }
+
+              length = tlv_to_ndnb(h, buf + msgstart, res - msgstart, msg);
             }
-            dres = ndn_skeleton_decode(d,
-                    face->inbuf->buf + d->index, // XXX - msgstart and d->index are the same here - use msgstart
-                    res = face->inbuf->length - d->index);  // XXX - why is res set here?
-        }
+            
+            ndn_charbuf_reset(msg);
+            charbuf_release(h, msg);
+            // TLV-hack end
+          }
+        else
+          {
+            dres = ndn_skeleton_decode(d, buf, res);
+            while (d->state == 0) {
+              process_input_message(h, source,
+                                    face->inbuf->buf + msgstart,
+                                    d->index - msgstart,
+                                    (face->flags & NDN_FACE_LOCAL) != 0);
+              msgstart = d->index;
+              if (msgstart == face->inbuf->length) {
+                face->inbuf->length = 0;
+                return;
+              }
+              dres = ndn_skeleton_decode(d,
+                                         face->inbuf->buf + d->index, // XXX - msgstart and d->index are the same here - use msgstart
+                                         res = face->inbuf->length - d->index);  // XXX - why is res set here?
+            }
+          }
         if ((face->flags & NDN_FACE_DGRAM) != 0) {
             ndnd_msg(h, "protocol error on face %u, discarding %u bytes",
                 source->faceid,

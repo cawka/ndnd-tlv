@@ -6,13 +6,13 @@ from waflib import Build, Logs, Utils, Task, TaskGen, Configure
 
 def options(opt):
     opt.load('compiler_c compiler_cxx gnu_dirs')
-    opt.load('openssl', tooldir=['waf-tools'])
+    opt.load('openssl boost', tooldir=['waf-tools'])
 
     opt = opt.add_option_group('NDN TLV Daemon Options')
     opt.add_option('--debug',action='store_true',default=False,dest='debug',help='''debugging mode''')
 
 def configure(conf):
-    conf.load("compiler_c compiler_cxx gnu_dirs openssl")
+    conf.load("compiler_c compiler_cxx gnu_dirs openssl boost")
 
     conf.find_program('sh')
     
@@ -41,29 +41,29 @@ def configure(conf):
     # conf.define ("PACKAGE_URL", "https://github.com/named-data/ndn-cpp")
 
     conf.check_openssl()
-    conf.check_cxx(lib='ndn-cpp-dev', uselib_store='NDN_CPP', mandatory=True)
-    
+    # conf.check_cxx(lib='ndn-cpp-dev', uselib_store='NDN_CPP', mandatory=True)
+    conf.check_boost(lib="system iostreams")
 
 def build (bld):
     bld (target = 'libc',
          features=['c', 'cxx'],
-         source = bld.path.ant_glob('lib/**/*.c'),
-         use = 'OPENSSL',
+         source = bld.path.ant_glob(['lib/**/*.c', 'tlv-hack/**/*.cpp']),
+         use = 'OPENSSL BOOST',
          includes = "include",
          )
 
     bld (target="bin/ndnd-tlv",
          features=['c', 'cxx', 'cxxprogram'],
          source = bld.path.ant_glob(['ndnd/**/*.c', 'ndnd/**/*.cpp']),
-         use = 'libc OPENSSL',
+         use = 'libc OPENSSL BOOST NDN_CPP',
          includes = "include",
         )
 
     for app in bld.path.ant_glob('bin/*.c'):
-        bld(features=['c', 'cprogram'],
+        bld(features=['c', 'cxxprogram'],
             target = app.change_ext('','.c'),
             source = app,
-            use = 'libc OPENSSL',
+            use = 'libc BOOST OPENSSL',
             includes = "include",
             )
 
