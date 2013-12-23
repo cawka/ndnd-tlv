@@ -5043,7 +5043,7 @@ process_input(struct ndnd_handle *h, int fd)
             ssize_t length;
 
             msg = charbuf_obtain(h);
-            length = tlv_to_ndnb(h, buf, res, msg);
+            length = tlv_to_ndnb(buf, res, msg);
 
             while (length > 0) {
               process_input_message(h, source,
@@ -5058,7 +5058,7 @@ process_input(struct ndnd_handle *h, int fd)
                 return;
               }
 
-              length = tlv_to_ndnb(h, buf + msgstart, res - msgstart, msg);
+              length = tlv_to_ndnb(buf + msgstart, res - msgstart, msg);
             }
             
             ndn_charbuf_reset(msg);
@@ -5233,18 +5233,33 @@ ndnd_send(struct ndnd_handle *h,
     ssize_t res;
     int fd;
     int bcast = 0;
+    unsigned char tlvbuf[8800];
+    size_t tlvsize = -1;
     
     if ((face->flags & NDN_FACE_NOSEND) != 0)
         return;
     face->surplus++;
-    if (face->outbuf != NULL) {
-        ndn_charbuf_append(face->outbuf, data, size);
-        return;
-    }
+
+    // no need to reformat
     if (face == h->face0) {
         ndnd_meter_bump(h, face->meter[FM_BYTO], size);
         ndn_dispatch_message(h->internal_client, (void *)data, size);
         ndnd_internal_client_has_somthing_to_say(h);
+        return;
+    }
+
+    // reformat to TLV before sending
+    tlvsize = ndnb_to_tlv(data, size, tlvbuf, 8800);
+    if (tlvsize < 0)
+      {
+        ndnd_msg(h, "ndnb_to_tlv: conversion error");
+      }
+
+    data = tlvbuf;
+    size = tlvsize;
+    
+    if (face->outbuf != NULL) {
+        ndn_charbuf_append(face->outbuf, data, size);
         return;
     }
     if ((face->flags & NDN_FACE_DGRAM) == 0)

@@ -55,7 +55,7 @@ def build (bld):
     bld (target="bin/ndnd-tlv",
          features=['c', 'cxx', 'cxxprogram'],
          source = bld.path.ant_glob(['ndnd/**/*.c', 'ndnd/**/*.cpp']),
-         use = 'libc OPENSSL BOOST NDN_CPP',
+         use = 'libc OPENSSL BOOST',
          includes = "include",
         )
 
