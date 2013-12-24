@@ -20,6 +20,10 @@
 
 namespace ndn {
 
+class Buffer;
+typedef ptr_lib::shared_ptr<const Buffer> ConstBufferPtr;
+typedef ptr_lib::shared_ptr<Buffer> BufferPtr;
+
 /**
  * @brief Class representing a general-use automatically managed/resized buffer
  *
@@ -167,7 +171,7 @@ struct OBufferStream : public boost::iostreams::stream<iostreams::buffer_append_
   }
 
 private:
-  boost::shared_ptr<Buffer> m_buffer;
+  BufferPtr m_buffer;
   iostreams::buffer_append_device m_device;
 };
 

@@ -19,7 +19,10 @@ extern "C" {
 }
 
 #include "tlv-hack.h"
-#include "ndnb2tlv.hpp"
+
+#include "tlv.hpp"
+#include "tlv-to-ndnb.hpp"
+#include "ndnb-to-tlv.hpp"
 
 using namespace ndn;
 
@@ -33,23 +36,26 @@ ssize_t
 tlv_to_ndnb(const unsigned char *buf, size_t length, struct ndn_charbuf *ndnb)
 {
   try {
-    tlv::Element tlv(reinterpret_cast<const uint8_t*> (buf), length);
+    Block block(reinterpret_cast<const uint8_t*> (buf), length);
 
-    switch (tlv.type()) {
-    case tlv::Interest:
-        interest_tlv_to_ndnb(tlv, ndnb);
+    switch (block.type()) {
+    case Tlv::Interest:
+        interest_tlv_to_ndnb(block, ndnb);
         break;
-    case tlv::Data:
-        data_tlv_to_ndnb(tlv, ndnb);
+    case Tlv::Data:
+        data_tlv_to_ndnb(block, ndnb);
         break;
     default:
       return -1;
       break;
     }
 
-    return tlv.size();
+    return block.size();
   }
-  catch (error::Tlv &error) {
+  catch (Tlv::Error &error) {
+    // do nothing
+  }
+  catch (Block::Error &error) {
     // do nothing
   }
   
@@ -59,6 +65,54 @@ tlv_to_ndnb(const unsigned char *buf, size_t length, struct ndn_charbuf *ndnb)
 ssize_t
 ndnb_to_tlv(const unsigned char *buf, size_t length, unsigned char *tlvbuf, size_t maxlength)
 {
+  struct ndn_skeleton_decoder decoder = {0};
+  struct ndn_skeleton_decoder *d = &decoder;
+  ssize_t dres;
+  enum ndn_dtag dtag;
+  
+  dres = ndn_skeleton_decode(d, buf, length);
+  if (dres < 0)
+    return dres;
+  else if (NDN_GET_TT_FROM_DSTATE(d->state) != NDN_DTAG) {
+    return -2;
+  }
+
+  dtag = static_cast<ndn_dtag> (d->numval);
+  switch (dtag) {
+  case NDN_DTAG_Interest:
+    {
+      struct ndn_parsed_interest parsed_interest = {0};
+      struct ndn_parsed_interest *pi = &parsed_interest;
+      struct ndn_indexbuf *comps = ndn_indexbuf_create();
+    
+      dres = ndn_parse_interest(buf, length, pi, comps);
+      if (dres < 0) {
+        ndn_indexbuf_destroy(&comps);
+        return dres;
+      }
+
+      ndn_indexbuf_destroy(&comps);
+      return -1;
+    }
+  case NDN_DTAG_ContentObject:
+    {
+      struct ndn_parsed_ContentObject obj = {0};
+      struct content_entry *content = NULL;
+      struct ndn_indexbuf *comps = ndn_indexbuf_create();
+
+      dres = ndn_parse_ContentObject(buf, length, &obj, comps);
+      if (dres < 0) {
+        ndn_indexbuf_destroy(&comps);
+        return dres;
+      }
+
+      ndn_indexbuf_destroy(&comps);
+      return -1;
+    }
+  default:
+    break;
+  }
+  
   return -1;
 }
 
