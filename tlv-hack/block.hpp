@@ -16,6 +16,7 @@
 #include <exception>
 
 #include "buffer.hpp"
+#include "tlv.hpp"
 
 namespace ndn {
 
@@ -90,6 +91,9 @@ public:
 
   void
   parse();
+
+  void
+  encode();
   
   inline uint32_t
   type() const;
@@ -108,6 +112,9 @@ public:
 
   inline element_const_iterator
   find(uint32_t type) const;
+
+  inline void
+  push_back(const Block &element);
   
   /**
    * @brief Get all subelements
@@ -140,6 +147,9 @@ public:
   value_end() const;
 
   inline const uint8_t*
+  wire() const;
+  
+  inline const uint8_t*
   value() const;
 
   inline size_t
@@ -149,8 +159,10 @@ protected:
   ConstBufferPtr m_buffer;
 
   uint32_t m_type;
+  
   Buffer::const_iterator m_begin;
   Buffer::const_iterator m_end;
+  uint32_t m_size;
   
   Buffer::const_iterator m_value_begin;
   Buffer::const_iterator m_value_end;
@@ -258,6 +270,12 @@ Block::find(uint32_t type)
   return m_subBlocks.end();
 }
 
+inline void
+Block::push_back(const Block &element)
+{
+  m_subBlocks.push_back(element);
+}
+
 
 inline const std::list<Block>&
 Block::getAll () const
@@ -293,10 +311,22 @@ Block::end() const
 inline size_t
 Block::size() const
 {
-  if (!hasWire())
-      throw new Error("Underlying wire buffer is empty");
+  if (hasWire() || hasValue()) {
+    return m_size;
+  }
+  else if (m_type != std::numeric_limits<uint32_t>::max()) {
+    if (m_size > 0)
+      return m_size;
 
-  return m_end - m_begin;
+    size_t size = 0;
+    for (element_const_iterator i = m_subBlocks.begin(); i != m_subBlocks.end(); ++i) {
+      size += i->size(); 
+    }
+    size += Tlv::sizeOfVarNumber(m_type) + Tlv::sizeOfVarNumber(size);
+    return size;
+  }
+  else
+    throw new Error("Block size cannot be determined (undefined block size)");
 }
 
 inline Buffer::const_iterator
@@ -317,6 +347,14 @@ Block::value_end() const
   return m_value_end;
 }
 
+inline const uint8_t*
+Block::wire() const
+{
+  if (!hasWire())
+      throw new Error("Underlying value buffer is empty");
+
+  return &*m_begin;
+}
 
 inline const uint8_t*
 Block::value() const

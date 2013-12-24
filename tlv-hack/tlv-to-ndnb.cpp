@@ -94,7 +94,7 @@ data_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
   ndn_charbuf_append_closer(ndnb); /* </ContentObject> */
 }
 
-void
+inline void
 name_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
 {
   block.parse();
@@ -109,7 +109,7 @@ name_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
   ndn_charbuf_append_closer(ndnb); /* </Name> */
 }
 
-void
+inline void
 selectors_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
 {
   block.parse();
@@ -189,7 +189,7 @@ exclude_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
   ndn_charbuf_append_closer(ndnb); /* </Exclude> */
 }
 
-void
+inline void
 signature_info_and_value_tlv_to_ndnb(Block &info, Block &value, ndn_charbuf *ndnb)
 {
   info.parse();
@@ -213,7 +213,7 @@ signature_info_and_value_tlv_to_ndnb(Block &info, Block &value, ndn_charbuf *ndn
   ndn_charbuf_append_closer(ndnb); /* </Signature> */
 }
 
-void
+inline void
 meta_and_signature_info_tlv_to_ndnb(Block &meta, Block &signature, ndn_charbuf *ndnb)
 {
   meta.parse();

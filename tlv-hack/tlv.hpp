@@ -110,6 +110,18 @@ template<class InputIterator>
 inline uint64_t
 readNonNegativeInteger(size_t size, InputIterator &begin, const InputIterator &end);
 
+/**
+ * @brief Get number of bytes necessary to hold value of nonNegativeInteger
+ */
+inline size_t
+sizeOfNonNegativeInteger(uint64_t varNumber);
+
+/**
+ * @brief Write nonNegativeInteger to the specified stream
+ */
+inline size_t
+writeNonNegativeInteger(std::ostream &os, uint64_t varNumber);
+
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////
@@ -220,7 +232,6 @@ writeVarNumber(std::ostream &os, uint64_t varNumber)
   }
 }
 
-
 template<class InputIterator>
 inline uint64_t
 readNonNegativeInteger(size_t size, InputIterator &begin, const InputIterator &end)
@@ -265,6 +276,49 @@ readNonNegativeInteger(size_t size, InputIterator &begin, const InputIterator &e
   }
   throw new Error("Invalid length for nonNegativeInteger (only 1, 2, 4, and 8 are allowed)");
 }
+
+inline size_t
+sizeOfNonNegativeInteger(uint64_t varNumber)
+{
+  if (varNumber < 253) {
+    return 1;
+  }
+  else if (varNumber <= std::numeric_limits<uint16_t>::max()) {
+    return 2;
+  }
+  else if (varNumber <= std::numeric_limits<uint32_t>::max()) {
+    return 4;
+  }
+  else {
+    return 8;
+  }
+}
+
+
+inline size_t
+writeNonNegativeInteger(std::ostream &os, uint64_t varNumber)
+{
+  if (varNumber < 253) {
+    os.put(static_cast<uint8_t> (varNumber));
+    return 1;
+  }
+  else if (varNumber <= std::numeric_limits<uint16_t>::max()) {
+    uint16_t value = htobe16(static_cast<uint16_t> (varNumber));
+    os.write(reinterpret_cast<const char*> (&value), 2);
+    return 2;
+  }
+  else if (varNumber <= std::numeric_limits<uint32_t>::max()) {
+    uint32_t value = htobe32(static_cast<uint32_t> (varNumber));
+    os.write(reinterpret_cast<const char*> (&value), 4);
+    return 4;
+  }
+  else {
+    uint64_t value = htobe64(varNumber);
+    os.write(reinterpret_cast<const char*> (&value), 8);
+    return 8;
+  }
+}
+
 
 } // namespace tlv
 } // namespace ndn

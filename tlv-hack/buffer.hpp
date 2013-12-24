@@ -112,7 +112,7 @@ namespace iostreams
 
 class buffer_append_device {
 public:
-  typedef uint8_t  char_type;
+  typedef char  char_type;
   typedef boost::iostreams::sink_tag       category;
   
   buffer_append_device (Buffer& container)
@@ -164,7 +164,7 @@ struct OBufferStream : public boost::iostreams::stream<iostreams::buffer_append_
    * Flush written data to the stream and return shared pointer to the underlying buffer
    */
   ptr_lib::shared_ptr<Buffer>
-  get ()
+  buf ()
   {
     flush ();
     return m_buffer;

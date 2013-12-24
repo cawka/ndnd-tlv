@@ -26,20 +26,20 @@ interest_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi, nd
 Block
 data_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObject &co, ndn_indexbuf &comps);
 
-// void
-// name_ndnb_to_tlv(tlv::Element &tlv, unsigned char *tlv, size_t maxsize);
+inline Block
+name_ndnb_to_tlv(const unsigned char *buf, ndn_indexbuf &comps);
 
-// void
-// selectors_ndnb_to_tlv(tlv::Element &tlv, unsigned char *tlv, size_t maxsize);
+inline Block
+selectors_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi);
 
-// void
-// exclude_ndnb_to_tlv(tlv::Element &tlv, unsigned char *tlv, size_t maxsize);
+inline Block
+exclude_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi);
 
-// void
-// signature_info_and_value_ndnb_to_tlv(tlv::Element &info, tlv::Element &value, struct ndn_charbuf *ndnb);
+inline Block
+meta_info_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObject &co);
 
-// void
-// meta_and_signature_info_ndnb_to_tlv(tlv::Element &meta, tlv::Element &signature, struct ndn_charbuf *ndnb);
+inline Block
+signature_info_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObject &co);
 
 }
 

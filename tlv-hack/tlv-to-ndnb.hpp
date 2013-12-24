@@ -18,28 +18,25 @@ struct ndn_charbuf;
 
 namespace ndn {
 
-size_t
-interest_tlv_to_ndnb();
-
 void
 interest_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);
 
 void
 data_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);
 
-void
+inline void
 name_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);
 
-void
+inline void
 selectors_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);
 
-void
+inline void
 exclude_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);
 
-void
+inline void
 signature_info_and_value_tlv_to_ndnb(Block &info, Block &value, ndn_charbuf *ndnb);
 
-void
+inline void
 meta_and_signature_info_tlv_to_ndnb(Block &meta, Block &signature, ndn_charbuf *ndnb);
 
 }

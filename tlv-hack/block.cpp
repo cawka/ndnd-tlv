@@ -26,6 +26,7 @@ Block::Block(const ConstBufferPtr &wire,
   , m_type(type)
   , m_begin(begin)
   , m_end(end)
+  , m_size(m_end - m_begin)
   , m_value_begin(valueBegin)
   , m_value_end(valueEnd)
 {
@@ -35,6 +36,7 @@ Block::Block(const ConstBufferPtr &buffer)
   : m_buffer(buffer)
   , m_begin(m_buffer->begin())
   , m_end(m_buffer->end())
+  , m_size(m_end - m_begin)
 {
   m_value_begin = m_buffer->begin();
   m_value_end   = m_buffer->end();
@@ -65,6 +67,7 @@ Block::Block(const uint8_t *buffer, size_t maxlength)
 
   m_begin = m_buffer->begin();
   m_end = m_buffer->end();
+  m_size = m_end - m_begin;
 
   m_value_begin = m_buffer->begin() + (tmp_begin - buffer);
   m_value_end   = m_buffer->end();
@@ -83,6 +86,7 @@ Block::Block(uint32_t type, const ConstBufferPtr &value)
   , m_value_begin(value->begin())
   , m_value_end(value->end())
 {
+  m_size = Tlv::sizeOfVarNumber(m_type) + Tlv::sizeOfVarNumber(value_size()) + value_size();
 }
 
 void
@@ -111,6 +115,34 @@ Block::parse()
       
       // don't do recursive parsing, just the top level
     }
+}
+
+void
+Block::encode()
+{
+  if (hasWire())
+    return;
+  
+  OBufferStream os;
+  Tlv::writeVarNumber(os, type());
+  Tlv::writeVarNumber(os, size());
+
+  for (element_const_iterator i = m_subBlocks.begin(); i != m_subBlocks.end(); ++i) {
+    os.write(reinterpret_cast<const char*>(i->wire()), i->size());
+  }
+
+  // now assign correct block
+
+  m_buffer = os.buf();
+  m_begin = m_buffer->begin();
+  m_end   = m_buffer->end();
+  m_size  = m_end - m_begin;
+
+  m_value_begin = m_buffer->begin();
+  m_value_end   = m_buffer->end();
+  
+  Tlv::readType(m_value_begin, m_value_end);
+  Tlv::readVarNumber(m_value_begin, m_value_end);
 }
 
 } // namespace ndn
