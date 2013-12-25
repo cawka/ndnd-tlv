@@ -10,7 +10,7 @@
 #ifndef NDN_NDNB_2_TLV_HPP
 #define NDN_NDNB_2_TLV_HPP
 
-#include "block.hpp"
+#include <ndn-cpp/encoding/block.hpp>
 
 extern "C" {
 struct ndn_charbuf;

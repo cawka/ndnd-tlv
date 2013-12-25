@@ -41,21 +41,21 @@ def configure(conf):
     # conf.define ("PACKAGE_URL", "https://github.com/named-data/ndn-cpp")
 
     conf.check_openssl()
-    # conf.check_cxx(lib='ndn-cpp-dev', uselib_store='NDN_CPP', mandatory=True)
+    conf.check_cxx(lib='ndn-cpp-dev', uselib_store='NDN_CPP', mandatory=True)
     conf.check_boost(lib="system iostreams")
 
 def build (bld):
     bld (target = 'libc',
          features=['c', 'cxx'],
          source = bld.path.ant_glob(['lib/**/*.c', 'tlv-hack/**/*.cpp']),
-         use = 'OPENSSL BOOST',
+         use = 'OPENSSL BOOST NDN_CPP',
          includes = "include",
          )
 
     bld (target="bin/ndnd-tlv",
          features=['c', 'cxx', 'cxxprogram'],
          source = bld.path.ant_glob(['ndnd/**/*.c', 'ndnd/**/*.cpp']),
-         use = 'libc OPENSSL BOOST',
+         use = 'libc OPENSSL BOOST NDN_CPP',
          includes = "include",
         )
 
@@ -63,7 +63,7 @@ def build (bld):
         bld(features=['c', 'cxxprogram'],
             target = app.change_ext('','.c'),
             source = app,
-            use = 'libc BOOST OPENSSL',
+            use = 'libc BOOST OPENSSL NDN_CPP',
             includes = "include",
             )
 

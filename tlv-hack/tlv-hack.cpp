@@ -20,7 +20,8 @@ extern "C" {
 
 #include "tlv-hack.h"
 
-#include "tlv.hpp"
+#include <ndn-cpp/encoding/tlv.hpp>
+
 #include "tlv-to-ndnb.hpp"
 #include "ndnb-to-tlv.hpp"
 
@@ -36,7 +37,7 @@ ssize_t
 tlv_to_ndnb(const unsigned char *buf, size_t length, struct ndn_charbuf *ndnb)
 {
   try {
-    Block block(reinterpret_cast<const uint8_t*> (buf), length);
+    Block block(buf, length);
 
     switch (block.type()) {
     case Tlv::Interest:

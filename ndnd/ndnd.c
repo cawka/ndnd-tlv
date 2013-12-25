@@ -5045,6 +5045,14 @@ process_input(struct ndnd_handle *h, int fd)
             msg = charbuf_obtain(h);
             length = tlv_to_ndnb(buf, res, msg);
 
+            // FILE *f = fopen("x.tlv", "wb");
+            // fwrite(buf, sizeof(char), res, f);
+            // fclose(f);
+            // 
+            // f = fopen("x.ndnb", "wb");
+            // fwrite(msg->buf, 1, msg->length, f);
+            // fclose(f);
+
             while (length > 0) {
               process_input_message(h, source,
                                     msg->buf,
@@ -5234,7 +5242,7 @@ ndnd_send(struct ndnd_handle *h,
     int fd;
     int bcast = 0;
     unsigned char tlvbuf[8800];
-    size_t tlvsize = -1;
+    ssize_t tlvsize = -1;
     
     if ((face->flags & NDN_FACE_NOSEND) != 0)
         return;

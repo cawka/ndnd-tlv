@@ -21,8 +21,6 @@ extern "C" {
 
 #include "ndnb-to-tlv.hpp"
 
-#include "tlv.hpp"
-
 namespace ndn {
 
 Block

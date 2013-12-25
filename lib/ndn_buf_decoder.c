@@ -656,7 +656,7 @@ ndn_parse_interest(const unsigned char *msg, size_t size,
         interest->offset[NDN_PI_E_InterestLifetime] = d->decoder.token_index;
         /* optional Nonce */
         interest->offset[NDN_PI_B_Nonce] = d->decoder.token_index;
-        res = ndn_parse_optional_tagged_BLOB(d, NDN_DTAG_Nonce, 4, 64);
+        res = ndn_parse_optional_tagged_BLOB(d, NDN_DTAG_Nonce, 1, 64);
         interest->offset[NDN_PI_E_Nonce] = d->decoder.token_index;
         interest->offset[NDN_PI_B_OTHER] = d->decoder.token_index;
         /* this is for local use */
