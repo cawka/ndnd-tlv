@@ -32,7 +32,11 @@ interest_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi, co
   interest.push_back(name_ndnb_to_tlv(buf, comps));
 
   // Selectors
-  interest.push_back(selectors_ndnb_to_tlv(buf, pi));
+  Block selectors = selectors_ndnb_to_tlv(buf, pi);
+  if (!selectors.getAll().empty())
+    {
+      interest.push_back(selectors);
+    }
 
   // "Guiders"
 

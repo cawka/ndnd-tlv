@@ -33,11 +33,15 @@ interest_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
   // Name
   name_tlv_to_ndnb(block.get(Tlv::Name), ndnb);
 
-  // 
-  selectors_tlv_to_ndnb(block.get(Tlv::Selectors), ndnb);
+  // Selectors
+  Block::element_iterator val = block.find(Tlv::Selectors);
+  if (val != block.getAll().end())
+    {
+      selectors_tlv_to_ndnb(*val, ndnb);
+    }
 
   // Scope
-  Block::element_iterator val = block.find(Tlv::Scope);
+  val = block.find(Tlv::Scope);
   if (val != block.getAll().end())
     {
       Buffer::const_iterator begin = val->value_begin();
