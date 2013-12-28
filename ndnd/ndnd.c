@@ -2794,21 +2794,23 @@ ndnd_nack(struct ndnd_handle *h, struct ndn_charbuf *reply_body,
     return(res);
 }
 
-/**
- * Check that indicated ndndid matches ours.
- *
- * Fills reply_body with a StatusResponse in case of no match.
- *
- * @returns 0 if OK, or NDN_CONTENT_NACK if not.
- */
-static int
-check_ndndid(struct ndnd_handle *h,
-             const void *p, size_t sz, struct ndn_charbuf *reply_body)
-{
-    if (sz != sizeof(h->ndnd_id) || memcmp(p, h->ndnd_id, sz) != 0)
-        return(ndnd_nack(h, reply_body, 531, "missing or incorrect ndndid"));
-    return(0);
-}
+// /**
+//  * Check that indicated ndndid matches ours.
+//  *
+//  * Fills reply_body with a StatusResponse in case of no match.
+//  *
+//  * @returns 0 if OK, or NDN_CONTENT_NACK if not.
+//  */
+// static int
+// check_ndndid(struct ndnd_handle *h,
+//              const void *p, size_t sz, struct ndn_charbuf *reply_body)
+// {
+//   return 0;
+//   // Disabled
+//   // if (sz != sizeof(h->ndnd_id) || memcmp(p, h->ndnd_id, sz) != 0)
+//   //   return(ndnd_nack(h, reply_body, 531, "missing or incorrect ndndid"));
+//   // return(0);
+// }
 
 /**
  * Check ndndid, given a face instance.
@@ -2817,7 +2819,9 @@ static int
 check_face_instance_ndndid(struct ndnd_handle *h,
     struct ndn_face_instance *f, struct ndn_charbuf *reply_body)
 {
-    return(check_ndndid(h, f->ndnd_id, f->ndnd_id_size, reply_body));
+    return 0;
+    // Disabled
+    // return(check_ndndid(h, f->ndnd_id, f->ndnd_id_size, reply_body));
 }
 
 /**
@@ -2827,7 +2831,9 @@ static int
 check_forwarding_entry_ndndid(struct ndnd_handle *h,
     struct ndn_forwarding_entry *f, struct ndn_charbuf *reply_body)
 {
-    return(check_ndndid(h, f->ndnd_id, f->ndnd_id_size, reply_body));
+    return 0;
+    // Disabled
+    // return(check_ndndid(h, f->ndnd_id, f->ndnd_id_size, reply_body));
 }
 
 /**

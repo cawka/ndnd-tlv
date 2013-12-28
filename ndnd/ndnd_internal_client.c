@@ -1029,22 +1029,28 @@ ndnd_answer_req(struct ndn_closure *selfp,
         if (res < 0)
             goto Bail;
     }
-    if ((selfp->intdata & MUST_VERIFY) != 0) {
-        struct ndn_parsed_ContentObject pco = {0};
-        // XXX - probably should check for message origin BEFORE verify
-        res = ndn_parse_ContentObject(final_comp, final_size, &pco, NULL);
-        if (res < 0) {
-            ndnd_debug_ndnb(ndnd, __LINE__, "co_parse_failed", NULL,
-                            info->interest_ndnb, info->pi->offset[NDN_PI_E]);
-            goto Bail;
-        }
-        res = ndn_verify_content(info->h, final_comp, &pco);
-        if (res != 0) {
-            ndnd_debug_ndnb(ndnd, __LINE__, "co_verify_failed", NULL,
-                            info->interest_ndnb, info->pi->offset[NDN_PI_E]);
-            goto Bail;
-        }
-    }
+    
+    //
+    // Disable verification
+    //
+    // if ((selfp->intdata & MUST_VERIFY) != 0) {
+    //     struct ndn_parsed_ContentObject pco = {0};
+    //     // XXX - probably should check for message origin BEFORE verify
+    //     res = ndn_parse_ContentObject(final_comp, final_size, &pco, NULL);
+    //     if (res < 0) {
+    //         ndnd_debug_ndnb(ndnd, __LINE__, "co_parse_failed", NULL,
+    //                         info->interest_ndnb, info->pi->offset[NDN_PI_E]);
+    //         goto Bail;
+    //     }
+    // 
+    //     res = ndn_verify_content(info->h, final_comp, &pco);
+    //     if (res != 0) {
+    //         ndnd_debug_ndnb(ndnd, __LINE__, "co_verify_failed", NULL,
+    //                         info->interest_ndnb, info->pi->offset[NDN_PI_E]);
+    //         goto Bail;
+    //     }
+    // }
+    
     sp.freshness = 10;
     switch (selfp->intdata & OPER_MASK) {
         case OP_PING:
