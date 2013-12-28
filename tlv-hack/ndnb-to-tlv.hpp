@@ -20,14 +20,19 @@ extern "C" {
 
 namespace ndn {
 
-Block
-interest_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi, ndn_indexbuf &comps);
+namespace NdnbToTlv
+{
+struct Error : public std::runtime_error { Error(const std::string &what) : std::runtime_error(what) {} };
+}
 
 Block
-data_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObject &co, ndn_indexbuf &comps);
+interest_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi, const ndn_indexbuf &comps);
+
+Block
+data_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObject &co, const ndn_indexbuf &comps);
 
 inline Block
-name_ndnb_to_tlv(const unsigned char *buf, ndn_indexbuf &comps);
+name_ndnb_to_tlv(const unsigned char *buf, const ndn_indexbuf &comps);
 
 inline Block
 selectors_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi);

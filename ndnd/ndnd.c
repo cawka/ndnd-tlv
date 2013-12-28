@@ -5261,6 +5261,7 @@ ndnd_send(struct ndnd_handle *h,
     if (tlvsize < 0)
       {
         ndnd_msg(h, "ndnb_to_tlv: conversion error");
+        return;
       }
 
     data = tlvbuf;

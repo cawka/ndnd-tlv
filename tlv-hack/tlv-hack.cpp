@@ -25,6 +25,8 @@ extern "C" {
 #include "tlv-to-ndnb.hpp"
 #include "ndnb-to-tlv.hpp"
 
+#include <fstream>
+
 using namespace ndn;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,12 +73,16 @@ ndnb_to_tlv(const unsigned char *buf, size_t length, unsigned char *tlvbuf, size
   ssize_t dres;
   enum ndn_dtag dtag;
   
+  d->state |= NDN_DSTATE_PAUSE;
   dres = ndn_skeleton_decode(d, buf, length);
   if (dres < 0)
-    return dres;
-  else if (NDN_GET_TT_FROM_DSTATE(d->state) != NDN_DTAG) {
-    return -2;
-  }
+    {
+      return dres;
+    }
+  else if (NDN_GET_TT_FROM_DSTATE(d->state) != NDN_DTAG)
+    {
+      return -2;
+    }
 
   dtag = static_cast<ndn_dtag> (d->numval);
   switch (dtag) {
@@ -92,13 +98,20 @@ ndnb_to_tlv(const unsigned char *buf, size_t length, unsigned char *tlvbuf, size
         return dres;
       }
 
+      Block b = interest_ndnb_to_tlv(buf, parsed_interest, *comps);
+      if (b.size() > maxlength) {
+        ndn_indexbuf_destroy(&comps);
+        return -10;
+      }
+
+      memcpy(tlvbuf, b.wire(), b.size());
+      
       ndn_indexbuf_destroy(&comps);
-      return -1;
+      return b.size();
     }
   case NDN_DTAG_ContentObject:
     {
       struct ndn_parsed_ContentObject obj = {0};
-      struct content_entry *content = NULL;
       struct ndn_indexbuf *comps = ndn_indexbuf_create();
 
       dres = ndn_parse_ContentObject(buf, length, &obj, comps);
@@ -107,8 +120,16 @@ ndnb_to_tlv(const unsigned char *buf, size_t length, unsigned char *tlvbuf, size
         return dres;
       }
 
+      Block b = data_ndnb_to_tlv(buf, obj, *comps);
+      if (b.size() > maxlength) {
+        ndn_indexbuf_destroy(&comps);
+        return -10;
+      }
+
+      memcpy(tlvbuf, b.wire(), b.size());
+      
       ndn_indexbuf_destroy(&comps);
-      return -1;
+      return b.size();
     }
   default:
     break;
