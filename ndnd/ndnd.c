@@ -2788,7 +2788,8 @@ ndnd_nack(struct ndnd_handle *h, struct ndn_charbuf *reply_body,
 {
     int res;
     reply_body->length = 0;
-    res = ndn_encode_StatusResponse(reply_body, errcode, errtext);
+
+    res = tlv_encode_StatusResponse(reply_body, errcode, errtext);
     if (res == 0)
         res = NDN_CONTENT_NACK;
     return(res);
@@ -5264,14 +5265,11 @@ ndnd_send(struct ndnd_handle *h,
 
     // reformat to TLV before sending
     tlvsize = ndnb_to_tlv(data, size, tlvbuf, 8800);
-    if (tlvsize < 0)
-      {
-        ndnd_msg(h, "ndnb_to_tlv: conversion error");
-        return;
-      }
-
-    data = tlvbuf;
-    size = tlvsize;
+    // Do the trick only when successfully converted (e.g., will fail for HTTP response)
+    if (tlvsize >= 0) {
+      data = tlvbuf;
+      size = tlvsize;
+    }
     
     if (face->outbuf != NULL) {
         ndn_charbuf_append(face->outbuf, data, size);

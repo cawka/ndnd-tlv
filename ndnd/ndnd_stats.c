@@ -102,7 +102,7 @@ ndnd_stats_handle_http_connection(struct ndnd_handle *h, struct face *face)
     int i;
     int nspace;
     int n;
-    
+
     if (face->inbuf->length < 4)
         return(-1);
     if ((face->flags & NDN_FACE_NOSEND) != 0) {

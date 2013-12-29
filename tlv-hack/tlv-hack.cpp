@@ -21,6 +21,7 @@ extern "C" {
 #include "tlv-hack.h"
 
 #include <ndn-cpp/encoding/tlv.hpp>
+#include <ndn-cpp/status-response.hpp>
 
 #include "tlv-to-ndnb.hpp"
 #include "ndnb-to-tlv.hpp"
@@ -138,5 +139,17 @@ ndnb_to_tlv(const unsigned char *buf, size_t length, unsigned char *tlvbuf, size
   return -1;
 }
 
+ssize_t
+tlv_encode_StatusResponse(struct ndn_charbuf *ndnb, int errcode, const char *errtext)
+{
+  StatusResponse response(errcode, errtext);
+  ssize_t ret = ndn_charbuf_append(ndnb, response.wireEncode().wire(), response.wireEncode().size());
+
+  if (ret < 0)
+    return ret;
+
+  return response.wireEncode().size();
+}
+  
 }
 
