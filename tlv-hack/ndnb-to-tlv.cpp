@@ -126,6 +126,19 @@ data_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObject &co, c
   return data;
 }
 
+Block
+name_ndnb_to_tlv(const ndn_charbuf *buf)
+{
+  ndn_indexbuf *idx = ndn_indexbuf_create();
+  ndn_name_split (buf, idx);
+
+  Block name = name_ndnb_to_tlv(buf->buf, *idx);
+  ndn_indexbuf_destroy(&idx);
+
+  return name;
+}
+
+
 inline Block
 name_ndnb_to_tlv(const unsigned char *buf, const ndn_indexbuf &comps)
 {

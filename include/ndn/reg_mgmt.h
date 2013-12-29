@@ -63,5 +63,4 @@ void ndn_forwarding_entry_destroy(struct ndn_forwarding_entry**);
 int ndnb_append_forwarding_entry(struct ndn_charbuf *,
                                  const struct ndn_forwarding_entry*);
 
-
 #endif

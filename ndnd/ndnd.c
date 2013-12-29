@@ -3071,8 +3071,10 @@ ndnd_req_prefix_or_self_reg(struct ndnd_handle *h,
     struct face *face = NULL;
     struct face *reqface = NULL;
     struct ndn_indexbuf *comps = NULL;
-    int nackallowed = 0;
+    int nackallowed = 1;
 
+
+    
     res = ndn_parse_ContentObject(msg, size, &pco, NULL);
     if (res < 0)
         goto Finish;

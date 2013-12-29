@@ -47,7 +47,7 @@ def configure(conf):
 def build (bld):
     bld (target = 'libc',
          features=['c', 'cxx'],
-         source = bld.path.ant_glob(['lib/**/*.c', 'tlv-hack/**/*.cpp']),
+         source = bld.path.ant_glob(['lib/**/*.c', 'lib/**/*.cpp', 'tlv-hack/**/*.cpp']),
          use = 'OPENSSL BOOST NDN_CPP',
          includes = "include",
          )

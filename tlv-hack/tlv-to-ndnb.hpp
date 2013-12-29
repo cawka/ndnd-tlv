@@ -11,6 +11,7 @@
 #define NDN_NDNB_2_TLV_HPP
 
 #include <ndn-cpp/encoding/block.hpp>
+#include <ndn-cpp/name.hpp>
 
 extern "C" {
 struct ndn_charbuf;
@@ -23,6 +24,11 @@ interest_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);
 
 void
 data_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);
+
+void
+name_to_ndnb(const Name &name, ndn_charbuf *ndnb);
+
+// Internal use only
 
 inline void
 name_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);

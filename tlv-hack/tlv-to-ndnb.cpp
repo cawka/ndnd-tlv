@@ -96,6 +96,21 @@ data_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
   ndn_charbuf_append_closer(ndnb); /* </ContentObject> */
 }
 
+void
+name_to_ndnb(const Name &name, ndn_charbuf *ndnb)
+{
+  // Name
+  ndn_charbuf_append_tt(ndnb, NDN_DTAG_Name, NDN_DTAG);
+
+  for (Name::const_iterator i = name.begin(); i != name.end(); ++i)
+    {
+      // Component
+      ndnb_append_tagged_blob(ndnb, NDN_DTAG_Component, i->getValue().buf(), i->getValue().size());
+    }
+  
+  ndn_charbuf_append_closer(ndnb); /* </Name> */
+}
+
 inline void
 name_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
 {

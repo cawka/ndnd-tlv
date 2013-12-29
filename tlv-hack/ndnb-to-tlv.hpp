@@ -31,6 +31,12 @@ interest_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi, co
 Block
 data_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObject &co, const ndn_indexbuf &comps);
 
+Block
+name_ndnb_to_tlv(const ndn_charbuf *buf);
+
+
+/// for internal use only
+
 inline Block
 name_ndnb_to_tlv(const unsigned char *buf, const ndn_indexbuf &comps);
 

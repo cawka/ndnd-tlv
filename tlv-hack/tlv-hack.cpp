@@ -150,6 +150,6 @@ tlv_encode_StatusResponse(struct ndn_charbuf *ndnb, int errcode, const char *err
 
   return response.wireEncode().size();
 }
-  
-}
+
+} // extern "C"
 

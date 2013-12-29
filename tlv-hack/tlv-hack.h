@@ -35,9 +35,14 @@ tlv_to_ndnb(const unsigned char *buf, size_t length, struct ndn_charbuf *ndnb);
 ssize_t
 ndnb_to_tlv(const unsigned char *buf, size_t length, unsigned char *tlvbuf, size_t maxlength);
 
+
+/***********************************************/
+/* Intrusive hach for Face Management protocol */
+/***********************************************/
+
 ssize_t
-tlv_encode_StatusResponse(struct ndn_charbuf *ndnb, int errcode, const char *errtext);
-  
+tlv_encode_StatusResponse(struct ndn_charbuf *ndnb, int errcode, const char *errtext);  
+
 #ifdef __cplusplus
 }
 #endif
