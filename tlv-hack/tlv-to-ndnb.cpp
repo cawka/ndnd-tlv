@@ -20,6 +20,7 @@ extern "C" {
 }
 
 #include "tlv-to-ndnb.hpp"
+#include <ndn-cpp/security/signature/signature-sha256-with-rsa.hpp>
 
 namespace ndn {
 
@@ -231,22 +232,32 @@ signature_info_and_value_tlv_to_ndnb(Block &info, Block &value, ndn_charbuf *ndn
 }
 
 inline void
-meta_and_signature_info_tlv_to_ndnb(Block &meta, Block &signature, ndn_charbuf *ndnb)
+meta_and_signature_info_tlv_to_ndnb(Block &metaInfo, Block &signatureInfo, ndn_charbuf *ndnb)
 {
-  meta.parse();
-  // already parsed
-  // reinterpret_cast<Tlv::Block*>(&signature)->parseTlv();
+  metaInfo.parse();
+  signatureInfo.parse();
 
   static char fakePublisherPublicKeyDigest[32];
   
   ndn_charbuf_append_tt(ndnb, NDN_DTAG_SignedInfo, NDN_DTAG);
 
+  ////////////////////////////////////////////////
+  // Note:
+  // NDNd requires PublisherPublicKeyDigest and Timestamp to be present in each Data packet
+  // NDN-TLV does not have these fields, so simply add junk data
+  //
+  
   // PublisherPublicKeyDigest (fake, required by CCNb)
   ndnb_append_tagged_blob(ndnb, NDN_DTAG_PublisherPublicKeyDigest, fakePublisherPublicKeyDigest, 32);
 
-  // ContentType
-  Block::element_iterator val = meta.find(Tlv::ContentType);
-  if (val != meta.getAll().end())
+  // Timestamp
+  ndn_charbuf_append_tt(ndnb, NDN_DTAG_Timestamp, NDN_DTAG);
+  ndnb_append_now_blob(ndnb, NDN_MARKER_NONE);
+  ndn_charbuf_append_closer(ndnb);
+  
+  // ContentType (aka Type)
+  Block::element_iterator val = metaInfo.find(Tlv::ContentType);
+  if (val != metaInfo.getAll().end())
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t value = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end());
@@ -274,47 +285,37 @@ meta_and_signature_info_tlv_to_ndnb(Block &meta, Block &signature, ndn_charbuf *
         }
     }
 
-  // FreshnessPeriod aka FreshnessSeconds
-  val = meta.find(Tlv::FreshnessPeriod);
-  if (val != meta.getAll().end())
+  // FreshnessPeriod (aka FreshnessSeconds)
+  val = metaInfo.find(Tlv::FreshnessPeriod);
+  if (val != metaInfo.getAll().end())
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t value = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end()) / 1000;
       ndnb_tagged_putf(ndnb, NDN_DTAG_FreshnessSeconds, "%d", value);    
     }
 
+  // FinalBlockID is optional and is not part of NDN-TLV
+  
   // KeyLocator
   {
-    const Block &signatureTypeBlock = signature.get(Tlv::SignatureType);
-    Buffer::const_iterator begin = signatureTypeBlock.value_begin();
-    uint64_t signatureType = Tlv::readNonNegativeInteger(signatureTypeBlock.value_size(),
-                                                         begin, signatureTypeBlock.value_end());
-    if (signatureType == Tlv::SignatureSha256WithRsa)
+    SignatureSha256WithRsa signature(signatureInfo);
+    // exception will be thrown if some other signature is used
+
+    // Only KeyName key locator is supported for now
+    if (signature.getKeyLocator().getType() == KeyLocator::KeyLocator_Name)
       {
-        Block::element_iterator keyLocatorBlock = signature.find(Tlv::KeyLocator);
-        if (keyLocatorBlock != signature.getAll().end())
-          {
-            keyLocatorBlock->parse();
-            Block::element_iterator name = keyLocatorBlock->find(Tlv::Name);
-            if (name != keyLocatorBlock->getAll().end())
-              {
-                ndn_charbuf_append_tt(ndnb, NDN_DTAG_KeyLocator, NDN_DTAG);
-                ndn_charbuf_append_tt(ndnb, NDN_DTAG_KeyName, NDN_DTAG);
+        ndn_charbuf_append_tt(ndnb, NDN_DTAG_KeyLocator, NDN_DTAG);
+        ndn_charbuf_append_tt(ndnb, NDN_DTAG_KeyName, NDN_DTAG);
 
-                for (Block::element_const_iterator component = name->getAll().begin ();
-                     component != name->getAll().end ();
-                     component++)
-                  {
-                    ndnb_append_tagged_blob(ndnb, NDN_DTAG_Component, component->value(), component->value_size());
-                  }
-
-                ndn_charbuf_append_closer(ndnb); /* </KeyName> */
-                ndn_charbuf_append_closer(ndnb); /* </KeyLocator> */  
-              }
-          }
+        name_to_ndnb(signature.getKeyLocator().getName(), ndnb);
+        
+        ndn_charbuf_append_closer(ndnb); /* </KeyName> */
+        ndn_charbuf_append_closer(ndnb); /* </KeyLocator> */  
       }
   }
-    
+
+  // ExtOpt is optional and is not part of NDN-TLV
+  
   ndn_charbuf_append_closer(ndnb); /* </SignedInfo> */  
 }
 

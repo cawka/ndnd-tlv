@@ -5039,8 +5039,12 @@ process_input(struct ndnd_handle *h, int fd)
             ndnd_stats_handle_http_connection(h, face);
             return;
         }
-        if (buf[0] == 0 || // TLV's Interest
-            buf[1] == 1)   // TLV's Data
+
+        // 0x01 0xD2  NDNb Interest
+        // 0x04 0x82  NDNb Data
+        
+        if (buf[0] == 0x00 || // TLV's Interest
+            (buf[0] == 0x01 && buf[1] != 0xD2))   // TLV's Data
           {
             // TLV-hack begin
             struct ndn_charbuf *msg;
@@ -5048,14 +5052,6 @@ process_input(struct ndnd_handle *h, int fd)
 
             msg = charbuf_obtain(h);
             length = tlv_to_ndnb(buf, res, msg);
-
-            // FILE *f = fopen("x.tlv", "wb");
-            // fwrite(buf, sizeof(char), res, f);
-            // fclose(f);
-            // 
-            // f = fopen("x.ndnb", "wb");
-            // fwrite(msg->buf, 1, msg->length, f);
-            // fclose(f);
 
             while (length > 0) {
               process_input_message(h, source,
