@@ -5075,6 +5075,8 @@ process_input(struct ndnd_handle *h, int fd)
           }
         else
           {
+            face->flags |= NDN_FACE_NDNB;
+            
             dres = ndn_skeleton_decode(d, buf, res);
             while (d->state == 0) {
               process_input_message(h, source,
@@ -5256,12 +5258,15 @@ ndnd_send(struct ndnd_handle *h,
         return;
     }
 
-    // reformat to TLV before sending
-    tlvsize = ndnb_to_tlv(data, size, tlvbuf, 8800);
-    // Do the trick only when successfully converted (e.g., will fail for HTTP response)
-    if (tlvsize >= 0) {
-      data = tlvbuf;
-      size = tlvsize;
+    // don't do conversions if face known to use NDNb format
+    if ((face->flags & NDN_FACE_NDNB) == 0) {
+      // reformat to TLV before sending
+      tlvsize = ndnb_to_tlv(data, size, tlvbuf, 8800);
+      // Do the trick only when successfully converted (e.g., will fail for HTTP response)
+      if (tlvsize >= 0) {
+        data = tlvbuf;
+        size = tlvsize;
+      }
     }
     
     if (face->outbuf != NULL) {
