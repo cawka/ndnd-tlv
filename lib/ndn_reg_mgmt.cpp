@@ -56,8 +56,6 @@ ndn_forwarding_entry_parse(const unsigned char *p, size_t size)
   ForwardingEntry entry;
   entry.wireDecode(Block(p, size));
 
-  std::cout << "[[ndn_forwarding_entry_parse]]  " << entry << std::endl;
-  
   // calloc zeroes memory
   struct ndn_forwarding_entry *result = (struct ndn_forwarding_entry *)calloc(1, sizeof(struct ndn_forwarding_entry));
 
@@ -78,10 +76,7 @@ ndn_forwarding_entry_parse(const unsigned char *p, size_t size)
     }
 
   // FaceID
-  if (entry.getFaceId() >= 0)
-    {
-      result->faceid = entry.getFaceId();
-    }
+  result->faceid = entry.getFaceId();
 
   // ForwardingFlags
   result->flags = 0;
@@ -106,6 +101,10 @@ ndn_forwarding_entry_parse(const unsigned char *p, size_t size)
   if (entry.getFreshnessPeriod() >= 0)
     {
       result->lifetime = entry.getFreshnessPeriod() / 1000;
+    }
+  else
+    {
+      result->lifetime = -1;
     }
   
   return(result);

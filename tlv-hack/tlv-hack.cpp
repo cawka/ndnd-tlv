@@ -22,6 +22,7 @@ extern "C" {
 
 #include <ndn-cpp/encoding/tlv.hpp>
 #include <ndn-cpp/status-response.hpp>
+#include <ndn-cpp/data.hpp>
 
 #include "tlv-to-ndnb.hpp"
 #include "ndnb-to-tlv.hpp"
@@ -149,6 +150,28 @@ tlv_encode_StatusResponse(struct ndn_charbuf *ndnb, int errcode, const char *err
     return ret;
 
   return response.wireEncode().size();
+}
+
+ssize_t
+tlv_data_get_content(const unsigned char *buf, size_t length, const unsigned char **content, size_t *contentSize)
+{
+  try {
+    Block block(buf, length);
+    
+    Data data;
+    data.wireDecode(Block(buf, length));
+
+    // A little bit not efficient: wireDecode will create bunch of temporary shared_ptr's,
+    // Moreover, the return value must be a pointer inside the original buffer
+    
+    *content = buf + (data.getContent().value() - &*data.wireEncode().begin());
+    *contentSize = data.getContent().value_size();
+
+    return 0;
+  }
+  catch (std::runtime_error &err) {
+    return -1;
+  }
 }
 
 } // extern "C"

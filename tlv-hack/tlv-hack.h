@@ -41,7 +41,10 @@ ndnb_to_tlv(const unsigned char *buf, size_t length, unsigned char *tlvbuf, size
 /***********************************************/
 
 ssize_t
-tlv_encode_StatusResponse(struct ndn_charbuf *ndnb, int errcode, const char *errtext);  
+tlv_encode_StatusResponse(struct ndn_charbuf *ndnb, int errcode, const char *errtext);
+
+ssize_t
+tlv_data_get_content(const unsigned char *buf, size_t length, const unsigned char **content, size_t *contentSize);
 
 #ifdef __cplusplus
 }

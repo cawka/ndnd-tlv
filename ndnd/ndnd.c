@@ -3073,12 +3073,7 @@ ndnd_req_prefix_or_self_reg(struct ndnd_handle *h,
     struct ndn_indexbuf *comps = NULL;
     int nackallowed = 1;
 
-
-    
-    res = ndn_parse_ContentObject(msg, size, &pco, NULL);
-    if (res < 0)
-        goto Finish;
-    res = ndn_content_get_value(msg, size, &pco, &req, &req_size);
+    res = tlv_data_get_content(msg, size, &req, &req_size);
     if (res < 0)
         goto Finish;
     res = -1;
