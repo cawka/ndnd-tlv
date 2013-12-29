@@ -58,9 +58,18 @@ struct ndn_forwarding_entry {
 struct ndn_forwarding_entry *
 ndn_forwarding_entry_parse(const unsigned char *p, size_t size);
 
-void ndn_forwarding_entry_destroy(struct ndn_forwarding_entry**);
+void
+ndn_forwarding_entry_destroy(struct ndn_forwarding_entry**);
 
-int ndnb_append_forwarding_entry(struct ndn_charbuf *,
-                                 const struct ndn_forwarding_entry*);
+int
+ndnb_append_forwarding_entry(struct ndn_charbuf *,
+                             const struct ndn_forwarding_entry*);
+
+struct ndn_forwarding_entry *
+tlv_forwarding_entry_parse(const unsigned char *p, size_t size);
+
+int
+tlv_append_forwarding_entry(struct ndn_charbuf *,
+                            const struct ndn_forwarding_entry*);
 
 #endif

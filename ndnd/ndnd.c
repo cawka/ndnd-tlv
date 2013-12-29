@@ -2783,13 +2783,17 @@ register_new_face(struct ndnd_handle *h, struct face *face)
  * @returns NDN_CONTENT_NACK, or -1 in case of error.
  */
 static int
-ndnd_nack(struct ndnd_handle *h, struct ndn_charbuf *reply_body,
+ndnd_nack(struct ndnd_handle *h, int tlvFormat,
+          struct ndn_charbuf *reply_body,
           int errcode, const char *errtext)
 {
     int res;
     reply_body->length = 0;
 
-    res = tlv_encode_StatusResponse(reply_body, errcode, errtext);
+    if (tlvFormat)
+      res = tlv_encode_StatusResponse(reply_body, errcode, errtext);
+    else
+      res = ndn_encode_StatusResponse(reply_body, errcode, errtext);
     if (res == 0)
         res = NDN_CONTENT_NACK;
     return(res);
@@ -2897,19 +2901,19 @@ ndnd_req_newface(struct ndnd_handle *h,
         goto Finish;
     if (face_instance->descr.ipproto != IPPROTO_UDP &&
         face_instance->descr.ipproto != IPPROTO_TCP) {
-        res = ndnd_nack(h, reply_body, 504, "parameter error");
+        res = ndnd_nack(h, 0, reply_body, 504, "parameter error");
         goto Finish;
     }
     if (face_instance->descr.address == NULL) {
-        res = ndnd_nack(h, reply_body, 504, "parameter error");
+        res = ndnd_nack(h, 0, reply_body, 504, "parameter error");
         goto Finish;
     }
     if (face_instance->descr.port == NULL) {
-        res = ndnd_nack(h, reply_body, 504, "parameter error");
+        res = ndnd_nack(h, 0, reply_body, 504, "parameter error");
         goto Finish;
     }
     if ((reqface->flags & NDN_FACE_GG) == 0) {
-        res = ndnd_nack(h, reply_body, 430, "not authorized");
+        res = ndnd_nack(h, 0, reply_body, 430, "not authorized");
         goto Finish;
     }
     hints.ai_flags |= AI_NUMERICHOST;
@@ -2926,7 +2930,7 @@ ndnd_req_newface(struct ndnd_handle *h,
                  face_instance->descr.port,
                  res);
     if (res != 0 || addrinfo == NULL) {
-        res = ndnd_nack(h, reply_body, 501, "syntax error in address");
+        res = ndnd_nack(h, 0, reply_body, 501, "syntax error in address");
         goto Finish;
     }
     if (addrinfo->ai_next != NULL)
@@ -2946,7 +2950,7 @@ ndnd_req_newface(struct ndnd_handle *h,
                                    addrinfo->ai_addr,
                                    addrinfo->ai_addrlen);
         if (face == NULL) {
-            res = ndnd_nack(h, reply_body, 453, "could not setup multicast");
+            res = ndnd_nack(h, 0, reply_body, 453, "could not setup multicast");
             goto Finish;
         }
         newface = get_dgram_source(h, face,
@@ -2978,7 +2982,7 @@ ndnd_req_newface(struct ndnd_handle *h,
             res = 0;
     }
     else
-        res = ndnd_nack(h, reply_body, 450, "could not create face");
+        res = ndnd_nack(h, 0, reply_body, 450, "could not create face");
 Finish:
     h->flood = save; /* restore saved flood flag */
     ndn_face_instance_destroy(&face_instance);
@@ -3049,7 +3053,7 @@ Finish:
         if (reqface == NULL || (reqface->flags & NDN_FACE_GG) == 0)
             res = -1;
         else
-            res = ndnd_nack(h, reply_body, 450, "could not destroy face");
+            res = ndnd_nack(h, 0, reply_body, 450, "could not destroy face");
     }
     ndn_face_instance_destroy(&face_instance);
     return((nackallowed || res <= 0) ? res : -1);
@@ -3072,12 +3076,28 @@ ndnd_req_prefix_or_self_reg(struct ndnd_handle *h,
     struct face *reqface = NULL;
     struct ndn_indexbuf *comps = NULL;
     int nackallowed = 1;
+    int tlvFormat = 1;
 
-    res = tlv_data_get_content(msg, size, &req, &req_size);
+    if (msg[0] == 0x04 && msg[1] == 0x82) // NDNb-encoded Data packet
+      {
+        tlvFormat = 0;
+        res = ndn_parse_ContentObject(msg, size, &pco, NULL);
+        if (res < 0)
+          goto Finish;
+        res = ndn_content_get_value(msg, size, &pco, &req, &req_size);
+      }
+    else // assume TLV-encoded Data packet
+      {
+        res = tlv_data_get_content(msg, size, &req, &req_size);
+      }
     if (res < 0)
         goto Finish;
     res = -1;
-    forwarding_entry = ndn_forwarding_entry_parse(req, req_size);
+    if (tlvFormat)
+      forwarding_entry = tlv_forwarding_entry_parse(req, req_size);
+    else
+      forwarding_entry = ndn_forwarding_entry_parse(req, req_size);
+    
     if (forwarding_entry == NULL || forwarding_entry->action == NULL)
         goto Finish;
     /* consider the source ... */
@@ -3131,14 +3151,17 @@ ndnd_req_prefix_or_self_reg(struct ndnd_handle *h,
     forwarding_entry->action = NULL;
     forwarding_entry->ndnd_id = h->ndnd_id;
     forwarding_entry->ndnd_id_size = sizeof(h->ndnd_id);
-    res = ndnb_append_forwarding_entry(reply_body, forwarding_entry);
+    if (tlvFormat)
+      res = tlv_append_forwarding_entry(reply_body, forwarding_entry);
+    else
+      res = ndnb_append_forwarding_entry(reply_body, forwarding_entry);
     if (res > 0)
         res = 0;
 Finish:
     ndn_forwarding_entry_destroy(&forwarding_entry);
     ndn_indexbuf_destroy(&comps);
     if (nackallowed && res < 0)
-        res = ndnd_nack(h, reply_body, 450, "could not register prefix");
+        res = ndnd_nack(h, tlvFormat, reply_body, 450, "could not register prefix");
     return((nackallowed || res <= 0) ? res : -1);
 }
 
@@ -3286,7 +3309,7 @@ Finish:
     ndn_forwarding_entry_destroy(&forwarding_entry);
     ndn_indexbuf_destroy(&comps);
     if (nackallowed && res < 0)
-        res = ndnd_nack(h, reply_body, 450, "could not unregister prefix");
+        res = ndnd_nack(h, 0, reply_body, 450, "could not unregister prefix");
     return((nackallowed || res <= 0) ? res : -1);
 }
 

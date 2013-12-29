@@ -51,7 +51,7 @@ using namespace ndn;
 extern "C" {
 
 struct ndn_forwarding_entry *
-ndn_forwarding_entry_parse(const unsigned char *p, size_t size)
+tlv_forwarding_entry_parse(const unsigned char *p, size_t size)
 {
   ForwardingEntry entry;
   entry.wireDecode(Block(p, size));
@@ -110,22 +110,9 @@ ndn_forwarding_entry_parse(const unsigned char *p, size_t size)
   return(result);
 }
 
-/**
- * Destroy the result of ndn_forwarding_entry_parse().
- */
-void
-ndn_forwarding_entry_destroy(struct ndn_forwarding_entry **pfe)
-{
-    if (*pfe == NULL)
-        return;
-    ndn_charbuf_destroy(&(*pfe)->name_prefix);
-    free(*pfe);
-    *pfe = NULL;
-}
-
 int
-ndnb_append_forwarding_entry(struct ndn_charbuf *c,
-                             const struct ndn_forwarding_entry *fe)
+tlv_append_forwarding_entry(struct ndn_charbuf *c,
+                            const struct ndn_forwarding_entry *fe)
 {
   ForwardingEntry entry;
 
