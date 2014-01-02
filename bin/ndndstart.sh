@@ -50,11 +50,11 @@ ndndsmoketest kill 2>/dev/null
 # Fork ndnd, with a log file if requested.
 if [ "$NDND_LOG" = "" ]
 then
-	ndnd &
+	ndnd-tlv &
         StuffPreload
 else
 	: >"$NDND_LOG" || exit 1
-	ndnd 2>"$NDND_LOG" &
+	ndnd-tlv 2>"$NDND_LOG" &
         StuffPreload 2> /dev/null
 fi
 

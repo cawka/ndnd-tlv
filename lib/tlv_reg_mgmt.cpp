@@ -62,8 +62,7 @@ tlv_forwarding_entry_parse(const unsigned char *p, size_t size)
   // Action
   if (!entry.getAction().empty())
     {
-      memcpy(result->store, entry.getAction().c_str(), entry.getAction().size());
-      result->store[entry.getAction().size()] = 0;
+      memcpy(result->store, entry.getAction().c_str(), entry.getAction().size()+1);
 
       result->action = reinterpret_cast<const char*>(result->store);
     }

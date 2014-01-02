@@ -45,8 +45,9 @@ def configure(conf):
     conf.check_boost(lib="system iostreams")
 
 def build (bld):
-    bld (target = 'libc',
-         features=['c', 'cxx'],
+    bld (target = 'ndn',
+         vnum = "1.0.0",
+         features=['c', 'cxx', 'cxxshlib'],
          source = bld.path.ant_glob(['lib/**/*.c', 'lib/**/*.cpp', 'tlv-hack/**/*.cpp']),
          use = 'OPENSSL BOOST NDN_CPP',
          includes = "include",
@@ -55,7 +56,7 @@ def build (bld):
     bld (target="bin/ndnd-tlv",
          features=['c', 'cxx', 'cxxprogram'],
          source = bld.path.ant_glob(['ndnd/**/*.c', 'ndnd/**/*.cpp']),
-         use = 'libc OPENSSL BOOST NDN_CPP',
+         use = 'ndn OPENSSL BOOST NDN_CPP',
          includes = "include",
         )
 
@@ -63,7 +64,7 @@ def build (bld):
         bld(features=['c', 'cxxprogram'],
             target = app.change_ext('','.c'),
             source = app,
-            use = 'libc BOOST OPENSSL NDN_CPP',
+            use = 'ndn BOOST OPENSSL NDN_CPP',
             includes = "include",
             )
 
@@ -72,7 +73,10 @@ def build (bld):
          target = [node.change_ext('', '.sh') for node in bld.path.ant_glob(['bin/**/*.sh'])],
          install_path = "${BINDIR}",
          chmod = 0755,
-        )        
+        )
+    
+    headers = bld.path.ant_glob(['include/**/*.h'])
+    bld.install_files(bld.env['INCLUDEDIR'], headers, relative_trick=True, cwd=bld.path.find_node('include'))
         
 @Configure.conf
 def add_supported_cxxflags(self, cxxflags):

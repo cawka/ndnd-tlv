@@ -39,6 +39,15 @@ struct ndn_face_instance {
     struct ndn_charbuf *store;
 };
 
+/**
+ * Parse a NDNb-ecoded FaceInstance into an internal representation
+ *
+ * The space used for the various strings is held by the charbuf.
+ * A client may replace the strings with other pointers, but then
+ * assumes responsibilty for managing those pointers.
+ * @returns pointer to newly allocated structure describing the face, or
+ *          NULL if there is an error.
+ */
 struct ndn_face_instance *ndn_face_instance_parse(const unsigned char *p,
                                                   size_t size);
 
@@ -46,5 +55,21 @@ void ndn_face_instance_destroy(struct ndn_face_instance**);
 
 int ndnb_append_face_instance(struct ndn_charbuf *,
                               const struct ndn_face_instance *);
+
+/**
+ * @brief Parse a TLV-ecoded FaceInstance into an internal representation
+ *
+ * The space used for the various strings is held by the charbuf.
+ * A client may replace the strings with other pointers, but then
+ * assumes responsibilty for managing those pointers.
+ * @returns pointer to newly allocated structure describing the face, or
+ *          NULL if there is an error.
+ */
+struct ndn_face_instance *
+tlv_face_instance_parse(const unsigned char *p, size_t size);
+
+int
+tlv_append_face_instance(struct ndn_charbuf *c,
+                         const struct ndn_face_instance *fi);
 
 #endif

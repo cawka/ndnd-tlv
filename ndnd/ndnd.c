@@ -3017,10 +3017,21 @@ ndnd_req_destroyface(struct ndnd_handle *h,
     struct ndn_face_instance *face_instance = NULL;
     struct face *reqface = NULL;
     int nackallowed = 0;
+    int tlvFormat = 1;
 
-    res = ndn_parse_ContentObject(msg, size, &pco, NULL);
-    if (res < 0) { at = __LINE__; goto Finish; }
-    res = ndn_content_get_value(msg, size, &pco, &req, &req_size);
+    if (msg[0] == 0x04 && msg[1] == 0x82) // NDNb-encoded Data packet
+      {
+        tlvFormat = 0;
+        res = ndn_parse_ContentObject(msg, size, &pco, NULL);
+        if (res < 0)
+          goto Finish;
+        res = ndn_content_get_value(msg, size, &pco, &req, &req_size);
+      }
+    else // assume TLV-encoded Data packet
+      {
+        res = tlv_data_get_content(msg, size, &req, &req_size);
+      }
+    
     if (res < 0) { at = __LINE__; goto Finish; }
     res = -1;
     face_instance = ndn_face_instance_parse(req, req_size);
@@ -3043,7 +3054,10 @@ ndnd_req_destroyface(struct ndnd_handle *h,
     face_instance->ndnd_id = h->ndnd_id;
     face_instance->ndnd_id_size = sizeof(h->ndnd_id);
     face_instance->lifetime = 0;
-    res = ndnb_append_face_instance(reply_body, face_instance);
+    if (tlvFormat)
+        res = tlv_append_face_instance(reply_body, face_instance);
+    else
+        res = ndnb_append_face_instance(reply_body, face_instance);
     if (res < 0) {
         at = __LINE__;
     }
@@ -3053,7 +3067,7 @@ Finish:
         if (reqface == NULL || (reqface->flags & NDN_FACE_GG) == 0)
             res = -1;
         else
-            res = ndnd_nack(h, 0, reply_body, 450, "could not destroy face");
+            res = ndnd_nack(h, tlvFormat, reply_body, 450, "could not destroy face");
     }
     ndn_face_instance_destroy(&face_instance);
     return((nackallowed || res <= 0) ? res : -1);
