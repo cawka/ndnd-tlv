@@ -5115,8 +5115,8 @@ process_input(struct ndnd_handle *h, int fd)
         // 0x01 0xD2  NDNb Interest
         // 0x04 0x82  NDNb Data
         
-        if (buf[0] == 0x00 || // TLV's Interest
-            (buf[0] == 0x01 && buf[1] != 0xD2))   // TLV's Data
+        if ((buf[0] == 0x01 && buf[1] != 0xD2) || // TLV's Interest
+            buf[0] == 0x02)   // TLV's Data
           {
             // TLV-hack begin
             struct ndn_charbuf *msg;

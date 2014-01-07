@@ -10,12 +10,14 @@ def options(opt):
 
     opt = opt.add_option_group('NDN TLV Daemon Options')
     opt.add_option('--debug',action='store_true',default=False,dest='debug',help='''debugging mode''')
+    opt.add_option('--with-c++11', action='store_true', default=False, dest='use_cxx11',
+                   help='''Enable C++11 compiler features''')
 
 def configure(conf):
     conf.load("compiler_c compiler_cxx gnu_dirs openssl boost")
 
     conf.find_program('sh')
-    
+
     if conf.options.debug:
         conf.define ('_DEBUG', 1)
         flags = ['-O0',
@@ -35,13 +37,17 @@ def configure(conf):
         conf.add_supported_cxxflags (cxxflags = flags)
         conf.add_supported_cflags (cflags = flags)
 
+    if conf.options.use_cxx11:
+        conf.add_supported_cxxflags(cxxflags = ['-std=c++11', '-std=c++0x'])
+
     conf.define ("PACKAGE_BUGREPORT", "ndn-lib@lists.cs.ucla.edu")
     conf.define ("PACKAGE_NAME", NAME)
     conf.define ("PACKAGE_VERSION", VERSION)
     # conf.define ("PACKAGE_URL", "https://github.com/named-data/ndn-cpp")
 
     conf.check_openssl()
-    conf.check_cxx(lib='ndn-cpp-dev', uselib_store='NDN_CPP', mandatory=True)
+    conf.check_cxx(lib='ndn-cpp', uselib_store='NDN_CPP', mandatory=True)
+    conf.check_cxx(lib='resolv',  uselib_store='RESOLV',  mandatory=True)
     conf.check_boost(lib="system iostreams")
 
 def build (bld):
