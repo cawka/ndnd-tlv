@@ -1,0 +1,29 @@
+# libexec/ndnd.conf.sample
+# 
+# Part of the NDNx distribution.
+#
+# Portions Copyright (C) 2013 Regents of the University of California.
+# 
+# Based on the CCNx C Library by PARC.
+# Copyright (C) 2009, 2010 Palo Alto Research Center, Inc.
+#
+# This work is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License version 2 as published by the
+# Free Software Foundation.
+# This work is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+
+#
+# Sample ndnd.conf for use with ndndc that will route all NDNx URIs with
+# a /ndnx.org prefix using local multicast.
+#
+# The multicast address 224.0.23.170 is assigned by IANA for use with NDNx.
+# Here we use a port that is different from the assigned port of 6363
+# to reduce confusion, in case some hosts on the local network are using the
+# latter for unicast traffic.  The port value 56363 is in the range for 
+# ephermeral and private use.
+# 
+# add ndn:/ndnx.org udp 224.0.23.170 56363
+#
