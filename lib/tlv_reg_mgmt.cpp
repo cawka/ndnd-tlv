@@ -68,11 +68,8 @@ tlv_forwarding_entry_parse(const unsigned char *p, size_t size)
     }
 
   // Name
-  if (!entry.getPrefix().empty())
-    {
-      result->name_prefix = ndn_charbuf_create();
-      name_to_ndnb(entry.getPrefix(), result->name_prefix);
-    }
+  result->name_prefix = ndn_charbuf_create();
+  name_to_ndnb(entry.getPrefix(), result->name_prefix);
 
   // FaceID
   result->faceid = entry.getFaceId();

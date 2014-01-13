@@ -3155,12 +3155,8 @@ ndnd_req_prefix_or_self_reg(struct ndnd_handle *h,
     }
     if (forwarding_entry->name_prefix == NULL)
         goto Finish;
-    if (forwarding_entry->ndnd_id_size == sizeof(h->ndnd_id)) {
-        if (memcmp(forwarding_entry->ndnd_id,
-                   h->ndnd_id, sizeof(h->ndnd_id)) != 0)
-            goto Finish;
-    }
-    else if (forwarding_entry->ndnd_id_size != 0)
+    res = check_forwarding_entry_ndndid(h, forwarding_entry, reply_body);
+    if (res != 0)
         goto Finish;
     face = face_from_faceid(h, forwarding_entry->faceid);
     if (face == NULL)
