@@ -266,7 +266,7 @@ struct face {
 #define NDN_FACE_BC    (1 << 20) /** Needs SO_BROADCAST to send */
 #define NDN_FACE_NBC   (1 << 21) /** Don't use SO_BROADCAST to send */
 #define NDN_FACE_ADJ   (1 << 22) /** Adjacency guid has been negotiatied */
-#define NDN_FACE_NDNB  (1 << 23) /** Face uses NDNb as a communication protocol (NDN-TLV is the default assumption) */
+#define NDN_FACE_TLV  (1 << 23) /** Face uses TLV as a communication protocol (NDNb is the default assumption) */
 #define NDN_NOFACEID    (~0U)    /** denotes no face */
 
 /**

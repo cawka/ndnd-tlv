@@ -5118,6 +5118,8 @@ process_input(struct ndnd_handle *h, int fd)
         if ((buf[0] == 0x01 && buf[1] != 0xD2) || // TLV's Interest
             buf[0] == 0x02)   // TLV's Data
           {
+            face->flags |= NDN_FACE_TLV;
+            
             // TLV-hack begin
             struct ndn_charbuf *msg;
             ssize_t length;
@@ -5147,8 +5149,6 @@ process_input(struct ndnd_handle *h, int fd)
           }
         else
           {
-            face->flags |= NDN_FACE_NDNB;
-            
             dres = ndn_skeleton_decode(d, buf, res);
             while (d->state == 0) {
               process_input_message(h, source,
@@ -5331,7 +5331,7 @@ ndnd_send(struct ndnd_handle *h,
     }
 
     // don't do conversions if face known to use NDNb format
-    if ((face->flags & NDN_FACE_NDNB) == 0) {
+    if ((face->flags & NDN_FACE_TLV) != 0) {
       // reformat to TLV before sending
       tlvsize = ndnb_to_tlv(data, size, tlvbuf, 8800);
       // Do the trick only when successfully converted (e.g., will fail for HTTP response)
