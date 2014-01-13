@@ -69,8 +69,11 @@ std::string
 create_command_from_command_line(int argc, char **argv)
 {
   std::ostringstream os;
-  for (int i = 0; i < argc; i++) {
-    os << argv[i] << " ";
+  if (argc >= 1)
+    os << argv[0];
+
+  for (int i = 1; i < argc; i++) {
+    os << " " << argv[i];
   }
     
   return os.str();

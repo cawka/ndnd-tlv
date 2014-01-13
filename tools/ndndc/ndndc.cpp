@@ -83,38 +83,33 @@ Controller::dispatch(int check_only,
       return INT_MIN;
     return add(check_only, options);
   }
-  // if (cmd == "del") {
-  //   if (num_options >= 0 && (num_options < 3 || num_options > 7))
-  //     return INT_MIN;
-  //   return del(check_only, options);
-  // }
-  // if (cmd == "create") {
-  //   if (num_options >= 0 && (num_options < 2 || num_options > 5))
-  //     return INT_MIN;
-  //   return create(check_only, options);
-  // }
-  // if (cmd == "destroy") {
-  //   if (num_options >= 0 && (num_options < 2 || num_options > 5))
-  //     return INT_MIN;
-  //   return destroy(check_only, options);
-  // }
-  // if (cmd == "destroyface") {
-  //   if (num_options >= 0 && num_options != 1)
-  //     return INT_MIN;
-  //   return destroyface(check_only, options);
-  // }
-  // if (cmd == "srv") {
-  //   // attempt to guess parameters using SRV record of a domain in search list
-  //   if (num_options >= 0 && num_options != 0)
-  //     return INT_MIN;
-  //   if (check_only) return 0;
-  //   return srv(NULL, 0);
-  // }
-  // if (cmd == "renew") {
-  //   if (num_options >= 0 && (num_options < 3 || num_options > 7))
-  //     return INT_MIN;
-  //   return renew(check_only, options);
-  // }
+  if (cmd == "del") {
+    if (num_options >= 0 && (num_options < 3 || num_options > 7))
+      return INT_MIN;
+    return del(check_only, options);
+  }
+  if (cmd == "create") {
+    if (num_options >= 0 && (num_options < 2 || num_options > 5))
+      return INT_MIN;
+    return create(check_only, options);
+  }
+  if (cmd == "destroy") {
+    if (num_options >= 0 && (num_options < 2 || num_options > 5))
+      return INT_MIN;
+    return destroy(check_only, options);
+  }
+  if (cmd == "destroyface") {
+    if (num_options >= 0 && num_options != 1)
+      return INT_MIN;
+    return destroyface(check_only, options);
+  }
+  if (cmd == "srv") {
+    // attempt to guess parameters using SRV record of a domain in search list
+    if (num_options >= 0 && num_options != 0)
+      return INT_MIN;
+    if (check_only) return 0;
+    return srv();
+  }
   return INT_MIN;
 }
 
@@ -133,6 +128,17 @@ getNextToken(tokenizer<escaped_list_separator<char> >::iterator &token, tokenize
     return "";
 }
 
+void
+NullPrefixAction(ptr_lib::shared_ptr<ForwardingEntry> prefix)
+{
+}
+
+void
+NullFaceAction(ptr_lib::shared_ptr<FaceInstance> prefix)
+{
+}
+
+
 } // anonymous namespace
 
 /*
@@ -144,31 +150,30 @@ Controller::add(int check_only,
                 const std::string &cmd)
 {
   try {
-  
     tokenizer<escaped_list_separator<char> > cmd_tokens(cmd, escaped_list_separator<char> ("\\", " \t", "'\""));
     tokenizer<escaped_list_separator<char> >::iterator token = cmd_tokens.begin();
 
-    std::string cmd_uri = getNextToken(token, cmd_tokens);
-    std::string cmd_proto = getNextToken(token, cmd_tokens);
-    std::string cmd_host = getNextToken(token, cmd_tokens);
-    std::string cmd_port = getNextToken(token, cmd_tokens);
-    std::string cmd_flags = getNextToken(token, cmd_tokens);
+    std::string cmd_uri      = getNextToken(token, cmd_tokens);
+    std::string cmd_proto    = getNextToken(token, cmd_tokens);
+    std::string cmd_host     = getNextToken(token, cmd_tokens);
+    std::string cmd_port     = getNextToken(token, cmd_tokens);
+    std::string cmd_flags    = getNextToken(token, cmd_tokens);
     std::string cmd_mcastttl = getNextToken(token, cmd_tokens);
-    std::string cmd_mcastif = getNextToken(token, cmd_tokens);
+    std::string cmd_mcastif  = getNextToken(token, cmd_tokens);
 
     ptr_lib::shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
                                                                      cmd_mcastttl, cmd_mcastif, m_lifetime);
     ptr_lib::shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry(cmd_uri,
                                                                              cmd_flags, m_lifetime);
+    prefix->setAction("prefixreg");
     
     if (!check_only) {
-      
       if (!boost::iequals(cmd_proto, "face")) {
         face->setAction("newface");
-        startFaceAction(face, func_lib::bind(&Controller::add_step2, this, _1, prefix));
+        startFaceAction(face, func_lib::bind(&Controller::add_or_del_step2, this, _1, prefix));
       }
       else {
-        add_step2(face, prefix);
+        add_or_del_step2(face, prefix);
       }
     }
     
@@ -182,450 +187,201 @@ Controller::add(int check_only,
 }
 
 void
-onPrefixActionSucceed(ptr_lib::shared_ptr<ForwardingEntry> prefix)
+Controller::add_or_del_step2(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix)
 {
-  std::cout << "Prefix registered [" << prefix->getPrefix() << "]" << std::endl;
+  prefix->setFaceId(face->getFaceId());
+  startPrefixAction(prefix, NullPrefixAction);
+}
+
+int
+Controller::del(int check_only,
+                const std::string &cmd)
+{
+  try {
+    tokenizer<escaped_list_separator<char> > cmd_tokens(cmd, escaped_list_separator<char> ("\\", " \t", "'\""));
+    tokenizer<escaped_list_separator<char> >::iterator token = cmd_tokens.begin();
+
+    std::string cmd_uri      = getNextToken(token, cmd_tokens);
+    std::string cmd_proto    = getNextToken(token, cmd_tokens);
+    std::string cmd_host     = getNextToken(token, cmd_tokens);
+    std::string cmd_port     = getNextToken(token, cmd_tokens);
+    std::string cmd_flags    = getNextToken(token, cmd_tokens);
+    std::string cmd_mcastttl = getNextToken(token, cmd_tokens);
+    std::string cmd_mcastif  = getNextToken(token, cmd_tokens);
+
+    ptr_lib::shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
+                                                                     cmd_mcastttl, cmd_mcastif, m_lifetime);
+    ptr_lib::shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry(cmd_uri,
+                                                                             cmd_flags, m_lifetime);
+    prefix->setAction("unreg");
+
+    if (!check_only) {
+      if (!boost::iequals(cmd_proto, "face")) {
+        face->setAction("newface");
+        startFaceAction(face, func_lib::bind(&Controller::add_or_del_step2, this, _1, prefix));
+      }
+      else {
+        add_or_del_step2(face, prefix);
+      }
+    }
+  }
+  catch(std::exception &e) {
+    ndndc_warn(__LINE__, e.what());
+    return -1;
+  }
+  
+  return 0;
+}
+
+/*
+ *   (udp|tcp) host [port [mcastttl [mcastif]]]
+ */
+int
+Controller::create(int check_only,
+                   const std::string &cmd)
+{
+  try {
+    tokenizer<escaped_list_separator<char> > cmd_tokens(cmd, escaped_list_separator<char> ("\\", " \t", "'\""));
+    tokenizer<escaped_list_separator<char> >::iterator token = cmd_tokens.begin();
+
+    std::string cmd_proto    = getNextToken(token, cmd_tokens);
+    std::string cmd_host     = getNextToken(token, cmd_tokens);
+    std::string cmd_port     = getNextToken(token, cmd_tokens);
+    std::string cmd_mcastttl = getNextToken(token, cmd_tokens);
+    std::string cmd_mcastif  = getNextToken(token, cmd_tokens);
+
+    ptr_lib::shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
+                                                                     cmd_mcastttl, cmd_mcastif, m_lifetime);
+
+    if (!check_only) {
+      face->setAction("newface");
+      startFaceAction(face, NullFaceAction);
+    }
+  }
+  catch(std::exception &e) {
+    ndndc_warn(__LINE__, e.what());
+    return -1;
+  }
+  
+  return 0;
+}
+
+/*
+ *   (udp|tcp) host [port [mcastttl [mcastif]]]
+ */
+int
+Controller::destroy(int check_only,
+                    const std::string &cmd)
+{
+  try {
+    tokenizer<escaped_list_separator<char> > cmd_tokens(cmd, escaped_list_separator<char> ("\\", " \t", "'\""));
+    tokenizer<escaped_list_separator<char> >::iterator token = cmd_tokens.begin();
+
+    std::string cmd_proto    = getNextToken(token, cmd_tokens);
+    std::string cmd_host     = getNextToken(token, cmd_tokens);
+    std::string cmd_port     = getNextToken(token, cmd_tokens);
+    std::string cmd_mcastttl = getNextToken(token, cmd_tokens);
+    std::string cmd_mcastif  = getNextToken(token, cmd_tokens);
+
+    ptr_lib::shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
+                                                                     cmd_mcastttl, cmd_mcastif, m_lifetime);
+
+    if (!check_only) {
+      face->setAction("destroyface");
+      startFaceAction(face, NullFaceAction);
+    }
+  }
+  catch(std::exception &e) {
+    ndndc_warn(__LINE__, e.what());
+    return -1;
+  }
+  
+  return 0;
+}    
+
+int
+Controller::destroyface(int check_only,
+                        const std::string &cmd)
+{
+  int ret_code = 0;
+    
+  if (cmd.empty()) {
+    throw Error("command error");
+  }
+    
+  ptr_lib::shared_ptr<FaceInstance> face = parse_ndn_face_instance_from_face(cmd);
+  if (!static_cast<bool>(face)) {
+    ret_code = -1;
+  }
+    
+  if (ret_code == 0 && check_only == 0) {
+    face->setAction("destroyface");
+    startFaceAction(face, NullFaceAction);
+  }
+    
+  return ret_code;
+}
+
+
+int
+Controller::srv()
+{
+  int res;
+    
+  std::string host;
+  int port_int = 0;
+  std::string proto;
+  res = ndndc_query_srv(host, port_int, proto);
+  if (res < 0) {
+    return -1;
+  }
+  std::string port = boost::lexical_cast<std::string>(port_int);
+
+  ptr_lib::shared_ptr<FaceInstance> face = parse_ndn_face_instance(proto, host, port, "", "", -1);
+  ptr_lib::shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry("/", "", m_lifetime);
+    
+  // crazy operation
+  // First. "Create" face, which will do nothing if face already exists
+  // Second. Destroy the face
+  // Third. Create face for real
+
+  face->setAction("newface");
+  startFaceAction(face, ptr_lib::bind(&Controller::srv_step2, this, _1, prefix));
+
+  return res;
 }
 
 void
-Controller::add_step2(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix)
+Controller::srv_step2(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix)
 {
-  prefix->setFaceId(face->getFaceId());
-  startPrefixAction(prefix, onPrefixActionSucceed);
+  face->setAction("destroyface");
+  startFaceAction(face, ptr_lib::bind(&Controller::srv_step3, this, _1, prefix));
 }
 
-// int
-// ndndc_del(struct ndndc_data *self,
-//           int check_only,
-//           const std::string &cmd_orig)
-// {
-//   int ret_code = -1;
-//   std::string &cmd, *cmd_token;
-//   std::string &cmd_uri = NULL;
-//   std::string &cmd_proto = NULL;
-//   std::string &cmd_host = NULL;
-//   std::string &cmd_port = NULL;
-//   std::string &cmd_flags = NULL;
-//   std::string &cmd_mcastttl = NULL;
-//   std::string &cmd_mcastif = NULL;
-//   struct ndn_face_instance *face = NULL;
-//   struct ndn_face_instance *newface = NULL;
-//   struct ndn_forwarding_entry *prefix = NULL;
-    
-//   if (cmd_orig == NULL) {
-//     ndndc_warn(__LINE__, "command error\n");
-//     return -1;
-//   }
-    
-//   cmd = strdup(cmd_orig);
-//   if (cmd == NULL) {
-//     ndndc_warn(__LINE__, "Cannot allocate memory for copy of the command\n");
-//     return -1;
-//   }            
-//   cmd_token = cmd;
-//   GET_NEXT_TOKEN(cmd_token, cmd_uri);
-//   GET_NEXT_TOKEN(cmd_token, cmd_proto);
-//   GET_NEXT_TOKEN(cmd_token, cmd_host);
-//   GET_NEXT_TOKEN(cmd_token, cmd_port);
-//   GET_NEXT_TOKEN(cmd_token, cmd_flags);
-//   GET_NEXT_TOKEN(cmd_token, cmd_mcastttl);
-//   GET_NEXT_TOKEN(cmd_token, cmd_mcastif);
-    
-//   face = parse_ndn_face_instance(self, cmd_proto, cmd_host, cmd_port,
-//                                  cmd_mcastttl, cmd_mcastif, (~0U) >> 1);
-//   prefix = parse_ndn_forwarding_entry(self, cmd_uri, cmd_flags, (~0U) >> 1);
-//   if (face == NULL || prefix == NULL)
-//     goto Cleanup;
-    
-//   if (!check_only) {
-//     if (0 != strcasecmp(cmd_proto, "face")) {
-//       newface = ndndc_do_face_action(self, "newface", face);
-//       if (newface == NULL) {
-//         ndndc_warn(__LINE__, "Cannot create/lookup face");
-//         goto Cleanup;
-//       }
-//       prefix->faceid = newface->faceid;
-//       ndn_face_instance_destroy(&newface);
-//     } else {
-//       prefix->faceid = face->faceid;
-//     }
-//     ret_code = ndndc_do_prefix_action(self, "unreg", prefix);
-//     if (ret_code < 0) {
-//       ndndc_warn(__LINE__, "Cannot unregister prefix [%s]\n", cmd_uri);
-//       goto Cleanup;
-//     }
-//   }
-//   ret_code = 0;
-//  Cleanup:
-//   ndn_face_instance_destroy(&face);
-//   ndn_forwarding_entry_destroy(&prefix);
-//   free(cmd);
-//   return (ret_code);
-// }
+void
+Controller::srv_step3(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix)
+{
+  face->setAction("newface");
+  startFaceAction(face, ptr_lib::bind(&Controller::srv_step4, this, _1, prefix));
+}
 
-// /*
-//  *   (udp|tcp) host [port [mcastttl [mcastif]]]
-//  */
-// int
-// ndndc_create(struct ndndc_data *self,
-//              int check_only,
-//              const std::string &cmd_orig)
-// {
-//   int ret_code = -1;
-//   std::string &cmd, *cmd_token;
-//   std::string &cmd_proto = NULL;
-//   std::string &cmd_host = NULL;
-//   std::string &cmd_port = NULL;
-//   std::string &cmd_mcastttl = NULL;
-//   std::string &cmd_mcastif = NULL;
-//   struct ndn_face_instance *face = NULL;
-//   struct ndn_face_instance *newface = NULL;
-    
-//   if (cmd_orig == NULL) {
-//     ndndc_warn(__LINE__, "command error\n");
-//     return -1;
-//   }
-    
-//   cmd = strdup(cmd_orig);
-//   if (cmd == NULL) {
-//     ndndc_warn(__LINE__, "Cannot allocate memory for copy of the command\n");
-//     return -1;
-//   }            
-//   cmd_token = cmd;
-//   GET_NEXT_TOKEN(cmd_token, cmd_proto);
-//   GET_NEXT_TOKEN(cmd_token, cmd_host);
-//   GET_NEXT_TOKEN(cmd_token, cmd_port);
-//   GET_NEXT_TOKEN(cmd_token, cmd_mcastttl);
-//   GET_NEXT_TOKEN(cmd_token, cmd_mcastif);
-    
-//   // perform sanity checking
-//   face = parse_ndn_face_instance(self, cmd_proto, cmd_host, cmd_port,
-//                                  cmd_mcastttl, cmd_mcastif, self->lifetime);
-//   if (face == NULL)
-//     goto Cleanup;
-    
-//   if (!check_only) {
-//     newface = ndndc_do_face_action(self, "newface", face);
-//     if (newface == NULL) {
-//       ndndc_warn(__LINE__, "Cannot create/lookup face");
-//       goto Cleanup;
-//     }
-//     ndn_face_instance_destroy(&newface);
-//   }
-//   ret_code = 0;
-//  Cleanup:
-//   ndn_face_instance_destroy(&face);
-//   free(cmd);
-//   return (ret_code);
-// }    
+void
+Controller::srv_step4(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix)
+{
+  prefix->setFaceId(face->getFaceId());
 
-// /*
-//  *   (udp|tcp) host [port [mcastttl [mcastif]]]
-//  */
-// int
-// ndndc_destroy(struct ndndc_data *self,
-//               int check_only,
-//               const std::string &cmd_orig)
-// {
-//   int ret_code = -1;
-//   std::string &cmd, *cmd_token;
-//   std::string &cmd_proto = NULL;
-//   std::string &cmd_host = NULL;
-//   std::string &cmd_port = NULL;
-//   std::string &cmd_mcastttl = NULL;
-//   std::string &cmd_mcastif = NULL;
-//   struct ndn_face_instance *face = NULL;
-//   struct ndn_face_instance *newface = NULL;
-    
-//   if (cmd_orig == NULL) {
-//     ndndc_warn(__LINE__, "command error\n");
-//     return -1;
-//   }
-    
-//   cmd = strdup(cmd_orig);
-//   if (cmd == NULL) {
-//     ndndc_warn(__LINE__, "Cannot allocate memory for copy of the command\n");
-//     return -1;
-//   }            
-//   cmd_token = cmd;
-//   GET_NEXT_TOKEN(cmd_token, cmd_proto);
-//   GET_NEXT_TOKEN(cmd_token, cmd_host);
-//   GET_NEXT_TOKEN(cmd_token, cmd_port);
-//   GET_NEXT_TOKEN(cmd_token, cmd_mcastttl);
-//   GET_NEXT_TOKEN(cmd_token, cmd_mcastif);
-    
-//   // perform sanity checking
-//   face = parse_ndn_face_instance(self, cmd_proto, cmd_host, cmd_port,
-//                                  cmd_mcastttl, cmd_mcastif, (~0U) >> 1);
-//   if (face == NULL)
-//     goto Cleanup;
-    
-//   if (!check_only) {
-//     // TODO: should use queryface when implemented
-//     if (0 != strcasecmp(cmd_proto, "face")) {
-//       newface = ndndc_do_face_action(self, "newface", face);
-//       if (newface == NULL) {
-//         ndndc_warn(__LINE__, "Cannot create/lookup face");
-//         goto Cleanup;
-//       }
-//       face->faceid = newface->faceid;
-//       ndn_face_instance_destroy(&newface);
-//     }
-//     newface = ndndc_do_face_action(self, "destroyface", face);
-//     if (newface == NULL) {
-//       ndndc_warn(__LINE__, "Cannot destroy face %d or the face does not exist\n", face->faceid);
-//       goto Cleanup;
-//     }
-//     ndn_face_instance_destroy(&newface);
-//   }  
-//   ret_code = 0;
-//  Cleanup:
-//   ndn_face_instance_destroy(&face);
-//   free(cmd);
-//   return ret_code;
-// }    
+  prefix->setAction("prefixreg");
+  startPrefixAction(prefix, NullPrefixAction);
 
-// /*
-//  *   (udp|tcp) host [port [mcastttl [mcastif]]]
-//  */
-// /*
-//  *   uri (udp|tcp) host [port [flags [mcastttl [mcastif]]]])
-//  *   uri face faceid
-//  */
-// int
-// ndndc_renew(struct ndndc_data *self,
-//             int check_only,
-//             const std::string &cmd_orig)
-// {
-//   int ret_code = -1;
-//   std::string &cmd, *cmd_token;
-//   std::string &cmd_uri = NULL;
-//   std::string &cmd_proto = NULL;
-//   std::string &cmd_host = NULL;
-//   std::string &cmd_port = NULL;
-//   std::string &cmd_flags = NULL;
-//   std::string &cmd_mcastttl = NULL;
-//   std::string &cmd_mcastif = NULL;
-//   struct ndn_face_instance *face = NULL;
-//   struct ndn_face_instance *newface = NULL;
-//   struct ndn_forwarding_entry *prefix = NULL;
-    
-//   if (cmd_orig == NULL) {
-//     ndndc_warn(__LINE__, "command error\n");
-//     return -1;
-//   }
-    
-//   cmd = strdup(cmd_orig);
-//   if (cmd == NULL) {
-//     ndndc_warn(__LINE__, "Cannot allocate memory for copy of the command\n");
-//     return -1;
-//   }            
-//   cmd_token = cmd;
-//   GET_NEXT_TOKEN(cmd_token, cmd_uri);
-//   GET_NEXT_TOKEN(cmd_token, cmd_proto);
-//   GET_NEXT_TOKEN(cmd_token, cmd_host);
-//   GET_NEXT_TOKEN(cmd_token, cmd_port);
-//   GET_NEXT_TOKEN(cmd_token, cmd_flags);
-//   GET_NEXT_TOKEN(cmd_token, cmd_mcastttl);
-//   GET_NEXT_TOKEN(cmd_token, cmd_mcastif);
-    
-//   // perform sanity checking
-//   face = parse_ndn_face_instance(self, cmd_proto, cmd_host, cmd_port,
-//                                  cmd_mcastttl, cmd_mcastif, (~0U) >> 1);
-//   prefix = parse_ndn_forwarding_entry(self, cmd_uri, cmd_flags, self->lifetime);
-//   if (face == NULL || prefix == NULL)
-//     goto Cleanup;
-    
-//   if (!check_only) {
-//     // look up the old face ("queryface" would be useful)
-//     newface = ndndc_do_face_action(self, "newface", face);
-//     if (newface == NULL) {
-//       ndndc_warn(__LINE__, "Cannot create/lookup face");
-//       goto Cleanup;
-//     }
-//     face->faceid = newface->faceid;
-//     ndn_face_instance_destroy(&newface);
-//     // destroy the old face
-//     newface = ndndc_do_face_action(self, "destroyface", face);
-//     if (newface == NULL) {
-//       ndndc_warn(__LINE__, "Cannot destroy face %d or the face does not exist\n", face->faceid);
-//       goto Cleanup;
-//     }
-//     ndn_face_instance_destroy(&newface);
-//     // recreate the face
-//     newface = ndndc_do_face_action(self, "newface", face);
-//     if (newface == NULL) {
-//       ndndc_warn(__LINE__, "Cannot create/lookup face");
-//       goto Cleanup;
-//     }
-//     prefix->faceid = newface->faceid;
-//     ndn_face_instance_destroy(&newface);
-//     // and add the prefix to it
-//     ret_code = ndndc_do_prefix_action(self, "prefixreg", prefix);
-//     if (ret_code < 0) {
-//       ndndc_warn(__LINE__, "Cannot register prefix [%s]\n", cmd_uri);
-//       goto Cleanup;
-//     }
-//   }  
-//   ret_code = 0;
-//  Cleanup:
-//   ndn_face_instance_destroy(&face);
-//   ndn_forwarding_entry_destroy(&prefix);
-//   free(cmd);
-//   return (ret_code);
-// }
+  prefix->setPrefix("/autoconf-route");
+  startPrefixAction(prefix, NullPrefixAction);
+}
 
 
-// int
-// ndndc_destroyface(struct ndndc_data *self,
-//                   int check_only,
-//                   const std::string &cmd_orig)
-// {
-//   int ret_code = 0;
-//   std::string &cmd, *cmd_token;
-//   std::string &cmd_faceid = NULL;
-//   struct ndn_face_instance *face;
-//   struct ndn_face_instance *newface;
-    
-//   if (cmd_orig == NULL) {
-//     ndndc_warn(__LINE__, "command error\n");
-//     return -1;
-//   }
-    
-//   cmd = strdup(cmd_orig);
-//   if (cmd == NULL) {
-//     ndndc_warn(__LINE__, "Cannot allocate memory for copy of the command\n");
-//     return -1;
-//   }            
-    
-//   cmd_token = cmd;    
-//   GET_NEXT_TOKEN(cmd_token, cmd_faceid);
-    
-//   face = parse_ndn_face_instance_from_face(self, cmd_faceid);
-//   if (face == NULL) {
-//     ret_code = -1;
-//   }
-    
-//   if (ret_code == 0 && check_only == 0) {
-//     newface = ndndc_do_face_action(self, "destroyface", face);
-//     if (newface == NULL) {
-//       ndndc_warn(__LINE__, "Cannot destroy face %d or the face does not exist\n", face->faceid);        
-//     }
-//     ndn_face_instance_destroy(&newface);
-//   }
-    
-//   ndn_face_instance_destroy(&face);
-//   free(cmd);
-//   return ret_code;
-// }
 
 
-// int
-// ndndc_srv(struct ndndc_data *self,
-//           const unsigned std::string &domain,
-//           size_t domain_size)
-// {
-//   std::string &proto = NULL;
-//   std::string &host = NULL;
-//   int port = 0;
-//   char port_str[10];
-//   struct ndn_charbuf *uri;
-//   struct ndn_charbuf *uri_auto = NULL;
-//   struct ndn_face_instance *face;
-//   struct ndn_face_instance *newface;
-//   struct ndn_forwarding_entry *prefix;
-//   struct ndn_forwarding_entry *prefix_auto;
-//   int res;
-    
-//   res = ndndc_query_srv(domain, domain_size, &host, &port, &proto);
-//   if (res < 0) {
-//     return -1;
-//   }
-    
-//   uri = ndn_charbuf_create();
-//   ndn_charbuf_append_string(uri, "ndn:/");
-//   if (domain_size != 0) {
-//     ndn_uri_append_percentescaped(uri, domain, domain_size);
-//   }
-    
-//   snprintf (port_str, sizeof(port_str), "%d", port);
-    
-//   /* now process the results */
-//   /* pflhead, lineno=0, "add" "ndn:/asdfasdf.com/" "tcp|udp", host, portstring, NULL NULL NULL */
-    
-//   ndndc_note(__LINE__, " >>> trying:   add %s %s %s %s <<<\n", ndn_charbuf_as_string(uri), proto, host, port_str);
-    
-//   face = parse_ndn_face_instance(self, proto, host, port_str, NULL, NULL,
-//                                  (~0U) >> 1);
-    
-//   prefix = parse_ndn_forwarding_entry(self, ndn_charbuf_as_string(uri), NULL,
-//                                       self->lifetime);
-//   if (face == NULL || prefix == NULL) {
-//     res = -1;
-//     goto Cleanup;
-//   }
-    
-//   // crazy operation
-//   // First. "Create" face, which will do nothing if face already exists
-//   // Second. Destroy the face
-//   // Third. Create face for real
-    
-//   newface = ndndc_do_face_action(self, "newface", face);
-//   if (newface == NULL) {
-//     ndndc_warn(__LINE__, "Cannot create/lookup face");
-//     res = -1;
-//     goto Cleanup;
-//   }
-    
-//   face->faceid = newface->faceid;
-//   ndn_face_instance_destroy(&newface);
-    
-//   newface = ndndc_do_face_action(self, "destroyface", face);
-//   if (newface == NULL) {
-//     ndndc_warn(__LINE__, "Cannot destroy face");
-//   } else {
-//     ndn_face_instance_destroy(&newface);
-//   }
-    
-//   newface = ndndc_do_face_action(self, "newface", face);
-//   if (newface == NULL) {
-//     ndndc_warn(__LINE__, "Cannot create/lookup face");
-//     res = -1;
-//     goto Cleanup;
-//   }
-    
-//   prefix->faceid = newface->faceid;
-//   ndn_face_instance_destroy(&newface);
-    
-//   res = ndndc_do_prefix_action(self, "prefixreg", prefix);
-//   if (res < 0) {
-//     ndndc_warn(__LINE__, "Cannot register prefix [%s]\n", ndn_charbuf_as_string(uri));
-//   }
 
-//   uri_auto = ndn_charbuf_create();
-//   ndn_charbuf_append_string(uri_auto, "ndn:/autoconf-route");
-//   prefix_auto = parse_ndn_forwarding_entry(self, ndn_charbuf_as_string(uri_auto), NULL,
-//                                            self->lifetime);
-//   if (prefix_auto == NULL) {
-//     res = -1;
-//     goto Cleanup;
-//   }
 
-//   prefix_auto->faceid = prefix->faceid;
-//   res = ndndc_do_prefix_action(self, "prefixreg", prefix_auto);
-//   if (res < 0) {
-//     ndndc_warn(__LINE__, "Cannot register prefix_auto [%s]\n", ndn_charbuf_as_string(uri_auto));
-//   }
-    
-//  Cleanup:
-//   free(host);
-//   ndn_charbuf_destroy(&uri);
-//   ndn_charbuf_destroy(&uri_auto);
-//   ndn_face_instance_destroy(&face);
-//   ndn_forwarding_entry_destroy(&prefix);
-//   ndn_forwarding_entry_destroy(&prefix_auto);
-//   return res;
-// }
 
 
 ptr_lib::shared_ptr<ForwardingEntry>
@@ -791,7 +547,7 @@ Controller::parse_ndn_face_instance_from_face(const std::string &cmd_faceid)
   if (cmd_faceid.empty()) {
     throw Error("command error, missing face number for destroyface");
   }
-  
+
   try {
     int face = boost::lexical_cast<int>(cmd_faceid);
     if (face < 0) {
@@ -806,10 +562,14 @@ Controller::parse_ndn_face_instance_from_face(const std::string &cmd_faceid)
   return entry;
 }
 
+namespace {
+
 void
 onFaceActionSuccess(func_lib::function< void (ptr_lib::shared_ptr<FaceInstance>) > onSuccess,
                     const ptr_lib::shared_ptr<Data> &data)
 {
+  std::cout << "onFaceActionSuccess" << std::endl;
+  
   Block content = data->getContent();
   content.parse();
 
@@ -836,7 +596,7 @@ onFaceActionSuccess(func_lib::function< void (ptr_lib::shared_ptr<FaceInstance>)
         StatusResponse resp;
         resp.wireDecode(*val);
       
-        throw Controller::Error("Error while communicating to the local NDN forwarder: " + boost::lexical_cast<std::string>(resp));
+        throw Controller::Error("Local NDN forwarder reported error: " + boost::lexical_cast<std::string>(resp));
         return;
       }
     default:
@@ -850,6 +610,8 @@ void
 onPrefixActionSuccess(func_lib::function< void (ptr_lib::shared_ptr<ForwardingEntry>) > onSuccess,
                     const ptr_lib::shared_ptr<Data> &data)
 {
+  std::cout << "onPrefixActionSuccess" << std::endl;
+
   Block content = data->getContent();
   content.parse();
 
@@ -876,7 +638,7 @@ onPrefixActionSuccess(func_lib::function< void (ptr_lib::shared_ptr<ForwardingEn
         StatusResponse resp;
         resp.wireDecode(*val);
       
-        throw Controller::Error("Error while communicating to the local NDN forwarder: " + boost::lexical_cast<std::string>(resp));
+        throw Controller::Error("Local NDN forwarder reported error: " + boost::lexical_cast<std::string>(resp));
         return;
       }
     default:
@@ -892,11 +654,13 @@ onActionFailure()
   throw Controller::Error("Error while communicating to the local NDN forwarder");
 }
 
+} // anonymous namespace
+
 void
 Controller::startFaceAction(ptr_lib::shared_ptr<FaceInstance> entry,
                             func_lib::function< void (ptr_lib::shared_ptr<FaceInstance>) > onSuccess)
 {
-  std::cout << *entry << std::endl;
+  std::cout << "START: " << *entry << std::endl;
   
   // Set the ForwardingEntry as the content of a Data packet and sign.
   Data data;
@@ -928,6 +692,8 @@ void
 Controller::startPrefixAction(ptr_lib::shared_ptr<ForwardingEntry> entry,
                               func_lib::function< void (ptr_lib::shared_ptr<ForwardingEntry>) > onSuccess)
 {
+  std::cout << "START: " << *entry << std::endl;
+
   // Set the ForwardingEntry as the content of a Data packet and sign.
   Data data;
   data.setContent(entry->wireEncode());

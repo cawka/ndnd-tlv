@@ -24,25 +24,16 @@
 #ifndef NDNDC_SRV_H
 #define NDNDC_SRV_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <string>
 
 /**
  * @brief Query SRV record of the domain
- * @param domain        domain name
- * @param domain_size   size of the "domain" variable
  * @param hostp         [out] gateway's IP address specified by an SRV record
  * @param portp         [out] gateway's port specified by an SRV record
  * @param proto         [out] gateway's protocol specified by an SRV record
  * @return 0 on success
  */
 int
-ndndc_query_srv (const unsigned char *domain, int domain_size,
-                 char **hostp, int *portp, char **proto);
-
-#ifdef __cplusplus
-}
-#endif
+ndndc_query_srv (std::string &hostp, int &portp, std::string &proto);
   
 #endif

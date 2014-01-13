@@ -133,15 +133,12 @@ public:
           const std::string &cmd);
 
   /**
-   * brief Add (and if exists recreated) FIB entry based on guess from SRV records for a specified domain
-   * @param domain        domain name
-   * @param domain_size   size of the "domain" variable
+   * brief Add (and if exists recreated) FIB entry based on guess from SRV records from a search list
    *
    * @returns 0 on success
    */
   int
-  srv(const std::string &domain,
-      size_t domain_size);
+  srv();
 
   /**
    * @brief Destroy face if it exists
@@ -163,6 +160,7 @@ public:
   {
     return m_face;
   }
+  
 private:
   void
   startFaceAction(ptr_lib::shared_ptr<FaceInstance> entry,
@@ -173,9 +171,20 @@ private:
                     func_lib::function< void (ptr_lib::shared_ptr<ForwardingEntry>) > onSuccess);
   
 
+  //
   void
-  add_step2(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix);
+  add_or_del_step2(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix);
 
+  //
+  void
+  srv_step2(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix);
+  
+  void
+  srv_step3(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix);
+  
+  void
+  srv_step4(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix);
+  
   // int
   // do_prefix_action(const std::string &action,
   //                  struct ndn_forwarding_entry *forwarding_entry);
