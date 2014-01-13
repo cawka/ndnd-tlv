@@ -22,7 +22,6 @@
  */
 
 #include "ndndc.hpp"
-#include "ndndc-log.h"
 #include "ndndc-srv.h"
 
 #include <errno.h>
@@ -179,7 +178,7 @@ Controller::add(int check_only,
     
   }
   catch(std::exception &e) {
-    ndndc_warn(__LINE__, e.what());
+    std::cerr << "WARN: " << e.what() << std::endl;
     return -1;
   }
     
@@ -226,7 +225,7 @@ Controller::del(int check_only,
     }
   }
   catch(std::exception &e) {
-    ndndc_warn(__LINE__, e.what());
+    std::cerr << "WARN: " << e.what() << std::endl;
     return -1;
   }
   
@@ -259,7 +258,7 @@ Controller::create(int check_only,
     }
   }
   catch(std::exception &e) {
-    ndndc_warn(__LINE__, e.what());
+    std::cerr << "WARN: " << e.what() << std::endl;
     return -1;
   }
   
@@ -292,7 +291,7 @@ Controller::destroy(int check_only,
     }
   }
   catch(std::exception &e) {
-    ndndc_warn(__LINE__, e.what());
+    std::cerr << "WARN: " << e.what() << std::endl;
     return -1;
   }
   
@@ -568,8 +567,6 @@ void
 onFaceActionSuccess(func_lib::function< void (ptr_lib::shared_ptr<FaceInstance>) > onSuccess,
                     const ptr_lib::shared_ptr<Data> &data)
 {
-  std::cout << "onFaceActionSuccess" << std::endl;
-  
   Block content = data->getContent();
   content.parse();
 
@@ -610,8 +607,6 @@ void
 onPrefixActionSuccess(func_lib::function< void (ptr_lib::shared_ptr<ForwardingEntry>) > onSuccess,
                     const ptr_lib::shared_ptr<Data> &data)
 {
-  std::cout << "onPrefixActionSuccess" << std::endl;
-
   Block content = data->getContent();
   content.parse();
 
@@ -660,8 +655,6 @@ void
 Controller::startFaceAction(ptr_lib::shared_ptr<FaceInstance> entry,
                             func_lib::function< void (ptr_lib::shared_ptr<FaceInstance>) > onSuccess)
 {
-  std::cout << "START: " << *entry << std::endl;
-  
   // Set the ForwardingEntry as the content of a Data packet and sign.
   Data data;
   data.setContent(entry->wireEncode());
@@ -692,8 +685,6 @@ void
 Controller::startPrefixAction(ptr_lib::shared_ptr<ForwardingEntry> entry,
                               func_lib::function< void (ptr_lib::shared_ptr<ForwardingEntry>) > onSuccess)
 {
-  std::cout << "START: " << *entry << std::endl;
-
   // Set the ForwardingEntry as the content of a Data packet and sign.
   Data data;
   data.setContent(entry->wireEncode());

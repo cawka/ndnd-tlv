@@ -22,7 +22,6 @@
  */
 
 #include "ndndc.hpp"
-#include "ndndc-log.h"
 #include "ndndc-srv.h"
 
 #include <stdio.h>
@@ -47,7 +46,6 @@ usage(const char *progname)
           "       -h print usage and exit\n"
           "       -f <configfile> add or delete FIB entries based on the content of <configfile>\n"
           "       -t use value in seconds for lifetime of prefix registration\n"
-          "       -v increase logging level\n"
           "\n"
           "   COMMAND can be one of following:\n"
           "       (add|del) <uri> (udp|tcp) <host> [<port> [<flags> [<mcastttl> [<mcastif>]]]])\n"
@@ -98,7 +96,7 @@ public:
     if (optind < argc) {
       /* config file cannot be combined with command line */
       if (configfile != NULL) {
-        ndndc_warn(__LINE__, "Config file cannot be combined with command line\n");
+        throw ndn::Controller::Error("Config file cannot be combined with command line");
         usage(progname);
         exit(res);
       }
@@ -135,7 +133,7 @@ public:
 void
 OnError()
 {
-  ndndc_warn(__LINE__, "Error communicating with local NDN forwarder\n");
+  throw ndn::Controller::Error("Error communicating with local NDN forwarder");
 }
 
 int
@@ -159,9 +157,6 @@ main(int argc, char **argv)
         return 1;
       }
       break;
-    case 'v':
-      verbose = 1;
-      break;
     case 'h':
     default:
       usage(p.progname);
@@ -178,7 +173,13 @@ main(int argc, char **argv)
                                                             OnError,
                                                             p.lifetime);
 
-  p.controller->getFace().processEvents();
+  try {
+    p.controller->getFace().processEvents();
+  }
+  catch(const std::exception &e) {
+    std::cerr << "ERROR: " << e.what() << std::endl;
+    return 2;
+  }
 
   return 0;
 }
@@ -213,8 +214,9 @@ read_configfile(ndn::Controller &ndndc, const char *filename)
     retcode = 0;
     lineno = 0;
     cfg = fopen(filename, "r");
-    if (cfg == NULL)
-      ndndc_fatal(__LINE__, "%s (%s)\n", strerror(errno), filename);
+    if (cfg == NULL) {
+      throw ndn::Controller::Error(std::string(strerror(errno)) + "(" + filename + ")");
+    }
         
     while (fgets((char *)buf, sizeof(buf), cfg)) {
       lineno++;
@@ -237,7 +239,7 @@ read_configfile(ndn::Controller &ndndc, const char *filename)
       res = ndndc.dispatch(phase, cmd, rest_of_the_command, -1);
       retcode += res;
       if (phase == 1 && res < 0) {
-        ndndc_warn(__LINE__, "Error: near line %d\n", lineno);
+        std::cerr << "WARN: " << "Error: near line " << lineno << std::endl;
         configerrors++;
       }
     }
