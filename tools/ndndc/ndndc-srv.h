@@ -24,13 +24,9 @@
 #ifndef NDNDC_SRV_H
 #define NDNDC_SRV_H
 
-/**
- * @brief Register / prefix and start dynamically creating entries based on SRV records
- *
- * This call will block thread forever
- */
-void
-ndndc_daemonize (struct ndndc_data *ndndc);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Query SRV record of the domain
@@ -45,4 +41,8 @@ int
 ndndc_query_srv (const unsigned char *domain, int domain_size,
                  char **hostp, int *portp, char **proto);
 
+#ifdef __cplusplus
+}
+#endif
+  
 #endif

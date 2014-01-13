@@ -23,6 +23,11 @@
 
 #ifndef NDNDC_LOG_H
 #define NDNDC_LOG_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Issue note on stderr, controlled by verbose flag
  * @param lineno Line number where problem happened
@@ -48,4 +53,9 @@ void
 ndndc_fatal(int lineno, const char *format, ...);
 
 extern int verbose;
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif // NDNDC_LOG_H

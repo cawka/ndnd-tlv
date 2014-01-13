@@ -21,10 +21,6 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "ndndc.h"
-#include "ndndc-srv.h"
-#include "ndndc-log.h"
-
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
@@ -59,33 +55,8 @@
 #define OP_UNREG 1
 
 /////////////////////////////////////////////////////////////
-// forward declaration for "private" methods
-/////////////////////////////////////////////////////////////
-
-enum ndn_upcall_res
-incoming_interest(struct ndn_closure *selfp,
-                  enum ndn_upcall_kind kind,
-                  struct ndn_upcall_info *info);
-
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////
-
-void
-ndndc_daemonize(struct ndndc_data *ndndc)
-{
-    struct ndn_closure interest_closure = { .p=&incoming_interest, .data = (void *)ndndc };
-    struct ndn_charbuf *temp = ndn_charbuf_create();
-    
-    /* Set up a handler for interests */
-    ndn_name_from_uri(temp, "ndn:/");
-    ndn_set_interest_filter_with_flags(ndndc->ndn_handle, temp, &interest_closure,
-                                       NDN_FORW_ACTIVE | NDN_FORW_CHILD_INHERIT | NDN_FORW_LAST);
-    ndn_charbuf_destroy(&temp);
-    
-    ndndc_note(__LINE__, "Starting dynamic DNS-based FIB prefix resolution\n");
-    ndn_run(ndndc->ndn_handle, -1);
-}
 
 int
 ndndc_query_srv(const unsigned char *domain, int domain_size,
@@ -198,39 +169,4 @@ ndndc_query_srv(const unsigned char *domain, int domain_size,
         *portp = port;
     }
     return (0);
-}
-
-enum ndn_upcall_res
-incoming_interest(struct ndn_closure *selfp,
-                  enum ndn_upcall_kind kind,
-                  struct ndn_upcall_info *info)
-{
-    const unsigned char *ndnb = info->interest_ndnb;
-    struct ndn_indexbuf *comps = info->interest_comps;
-    const unsigned char *comp0 = NULL;
-    size_t comp0_size = 0;
-    int res;
-    struct ndndc_data *ndndc = (struct ndndc_data *)selfp->data;
-    
-    if (kind == NDN_UPCALL_FINAL)
-        return (NDN_UPCALL_RESULT_OK);
-    if (kind != NDN_UPCALL_INTEREST)
-        return (NDN_UPCALL_RESULT_ERR);
-    if (comps->n < 1)
-        return (NDN_UPCALL_RESULT_OK);
-    
-    
-    res = ndn_ref_tagged_BLOB(NDN_DTAG_Component, ndnb, comps->buf[0], comps->buf[1],
-                              &comp0, &comp0_size);
-    if (res < 0 || comp0_size > (NS_MAXDNAME - 12))
-        return (NDN_UPCALL_RESULT_OK);
-    if (memchr(comp0, '.', comp0_size) == NULL)
-        return (NDN_UPCALL_RESULT_OK);
-    
-    res = ndndc_srv(ndndc, comp0, comp0_size);
-    
-    if (res < 0)
-        return (NDN_UPCALL_RESULT_ERR);
-    
-    return (NDN_UPCALL_RESULT_OK);
 }
