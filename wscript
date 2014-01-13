@@ -1,8 +1,9 @@
 # -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 VERSION='0.3~dev0'
-NAME="ndn-tlv-daemon"
+NAME="ndnd-tlv"
 
 from waflib import Build, Logs, Utils, Task, TaskGen, Configure
+import os
 
 def options(opt):
     opt.load('compiler_c compiler_cxx gnu_dirs')
@@ -66,7 +67,16 @@ def build (bld):
          includes = "include",
         )
 
-    for app in bld.path.ant_glob('bin/*.c'):
+    for app in bld.path.ant_glob('tools/*', dir=True):
+        if os.path.isdir(app.abspath()):
+            bld(features=['c', 'cxx', 'cxxprogram'],
+                target = 'bin/%s/%s' % (str(app), str(app)),
+                source = app.ant_glob(['**/*.c', '**/*.cpp']),
+                use = 'ndn BOOST OPENSSL NDN_CPP RESOLV',
+                includes = "include",
+                )
+
+    for app in bld.path.ant_glob('tools/*.c'):
         bld(features=['c', 'cxxprogram'],
             target = app.change_ext('','.c'),
             source = app,
@@ -75,15 +85,18 @@ def build (bld):
             )
 
     bld (features = "subst",
-         source = bld.path.ant_glob(['bin/**/*.sh']),
-         target = [node.change_ext('', '.sh') for node in bld.path.ant_glob(['bin/**/*.sh'])],
+         source = bld.path.ant_glob(['tools/**/*.sh']),
+         target = [node.change_ext('', '.sh') for node in bld.path.ant_glob(['tools/**/*.sh'])],
          install_path = "${BINDIR}",
          chmod = 0755,
         )
+
+    bld.install_files(bld.env['INCLUDEDIR'], bld.path.ant_glob(['include/**/*.h']), 
+                      relative_trick=True, cwd=bld.path.find_node('include'))
     
-    headers = bld.path.ant_glob(['include/**/*.h'])
-    bld.install_files(bld.env['INCLUDEDIR'], headers, relative_trick=True, cwd=bld.path.find_node('include'))
-        
+    bld.install_files('%s/ndn' % bld.env['INCLUDEDIR'], bld.path.ant_glob(['tlv-hack/**/*.h', 'tlv-hack/**/*.hpp']), 
+                      relative_trick=True, cwd=bld.path.find_node('tlv-hack'))
+
 @Configure.conf
 def add_supported_cxxflags(self, cxxflags):
     """
