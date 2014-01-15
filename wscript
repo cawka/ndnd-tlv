@@ -11,6 +11,8 @@ def options(opt):
 
     opt = opt.add_option_group('NDN TLV Daemon Options')
     opt.add_option('--debug',action='store_true',default=False,dest='debug',help='''debugging mode''')
+    opt.add_option('--with-ndn-cpp',action='store',type='string',default=None,dest='ndn_cpp_dir',
+                   help='''Use NDN-CPP library from the specified path''')
     opt.add_option('--with-c++11', action='store_true', default=False, dest='use_cxx11',
                    help='''Enable C++11 compiler features''')
 
@@ -47,7 +49,15 @@ def configure(conf):
     # conf.define ("PACKAGE_URL", "https://github.com/named-data/ndn-cpp")
 
     conf.check_openssl()
-    conf.check_cxx(lib='ndn-cpp', uselib_store='NDN_CPP', mandatory=True)
+
+    if not conf.options.ndn_cpp_dir:
+        conf.check_cxx(lib='ndn-cpp', uselib_store='NDN_CPP', mandatory=True)
+    else:
+        conf.check_cxx(lib='ndn-cpp', uselib_store='NDN_CPP', 
+                       cxxflags="-I%s/include" % conf.options.ndn_cpp_dir,
+                       linkflags="-L%s/lib" % conf.options.ndn_cpp_dir,
+                       mandatory=True)
+        
     conf.check_cxx(lib='resolv',  uselib_store='RESOLV',  mandatory=True)
     conf.check_boost(lib="system iostreams")
 
