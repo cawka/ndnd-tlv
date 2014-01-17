@@ -440,12 +440,25 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
                                     int freshness)
 {
   struct addrinfo hints;
-  hints.ai_family = AF_UNSPEC;
   hints.ai_flags = (AI_ADDRCONFIG);
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype=0;
+  hints.ai_protocol=0;
+  hints.ai_addrlen=0;
+  hints.ai_addr=0;
+  hints.ai_canonname=0;
+  hints.ai_next=0;
+    
 
   struct addrinfo mcasthints;
-  mcasthints.ai_family = AF_UNSPEC;
   mcasthints.ai_flags = (AI_ADDRCONFIG | AI_NUMERICHOST);
+  mcasthints.ai_family = AF_UNSPEC;
+  mcasthints.ai_socktype=0;
+  mcasthints.ai_protocol=0;
+  mcasthints.ai_addrlen=0;
+  mcasthints.ai_addr=0;
+  mcasthints.ai_canonname=0;
+  mcasthints.ai_next=0;
 
   struct addrinfo *raddrinfo = NULL;
   struct addrinfo *mcastifaddrinfo = NULL;
@@ -491,7 +504,7 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
   hints.ai_socktype = socktype;
   res = getaddrinfo(cmd_host.c_str(), cmd_port_real.c_str(), &hints, &raddrinfo);
   if (res != 0 || raddrinfo == NULL) {
-    throw Error("command error, getaddrinfo for host ["+cmd_host+"] port ["+cmd_port+"]: "+gai_strerror(res));
+    throw Error("command error, getaddrinfo for host ["+cmd_host+"] port ["+cmd_port_real+"]: "+gai_strerror(res));
   }
   res = getnameinfo(raddrinfo->ai_addr, raddrinfo->ai_addrlen,
                     rhostnamebuf, sizeof(rhostnamebuf),
