@@ -20,7 +20,7 @@
  * if not, write to the Free Software Foundation, Inc., 51 Franklin Street,
  * Fifth Floor, Boston, MA 02110-1301 USA.
  */
-#include <ndn/coding.h>
+#include <ndn-tlv/coding.h>
 
 /**
  * This macro documents what's happening in the state machine by

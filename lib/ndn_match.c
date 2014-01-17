@@ -23,11 +23,11 @@
  */
 #include <stdlib.h>
 #include <string.h>
-#include <ndn/bloom.h>
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/coding.h>
-#include <ndn/digest.h>
+#include <ndn-tlv/bloom.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/coding.h>
+#include <ndn-tlv/digest.h>
 
 /**
  * Compute the digest of the entire ContentObject if necessary,

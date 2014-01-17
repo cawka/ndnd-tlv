@@ -26,8 +26,8 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <ndn/charbuf.h>
-#include <ndn/extend_dict.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/extend_dict.h>
 
 static int
 qsort_compare_dict_names(const void *x, const void *y)

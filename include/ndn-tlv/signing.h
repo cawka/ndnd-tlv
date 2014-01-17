@@ -1,5 +1,5 @@
 /**
- * @file ndn/signing.h
+ * @file ndn-tlv/signing.h
  * 
  * Message signing interface.
  * This is a veneer so that the ndn code can use various underlying
@@ -28,7 +28,7 @@
 #define NDN_SIGNING_DEFINED
 
 #include <stddef.h>
-#include <ndn/charbuf.h>
+#include <ndn-tlv/charbuf.h>
 
 /*
  * opaque type for signing context
@@ -46,7 +46,7 @@ struct ndn_pkey;
 struct ndn_signature;
 
 /*
- * see ndn/ndn.h
+ * see ndn-tlv/ndn.h
  */
 struct ndn_parsed_ContentObject;
 

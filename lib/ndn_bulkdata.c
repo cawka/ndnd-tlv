@@ -25,10 +25,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ndn/bloom.h>
-#include <ndn/ndn.h>
+#include <ndn-tlv/bloom.h>
+#include <ndn-tlv/ndn.h>
 
-/************ Candidate API stuff - was in ndn/ndn.h for a while ******/
+/************ Candidate API stuff - was in ndn-tlv/ndn.h for a while ******/
 /***********************************
  * Bulk data
  */

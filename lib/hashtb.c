@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ndn/hashtb.h>
+#include <ndn-tlv/hashtb.h>
 
 struct node;
 struct node {

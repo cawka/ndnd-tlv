@@ -23,9 +23,9 @@
  * Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/coding.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/coding.h>
 
 /**
  * @returns the lifetime of the interest in units of 2**(-12) seconds

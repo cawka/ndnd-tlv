@@ -34,11 +34,11 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#include <ndn/ndn_private.h>
-#include <ndn/coding.h>
-#include <ndn/reg_mgmt.h>
-#include <ndn/schedule.h>
-#include <ndn/seqwriter.h>
+#include <ndn-tlv/ndn_private.h>
+#include <ndn-tlv/coding.h>
+#include <ndn-tlv/reg_mgmt.h>
+#include <ndn-tlv/schedule.h>
+#include <ndn-tlv/seqwriter.h>
 
 /*
  * These are defined in other ndn headers, but the incomplete types suffice
@@ -415,7 +415,7 @@ struct nameprefix_entry {
  */
 struct ndn_forwarding {
     unsigned faceid;             /**< locally unique number identifying face */
-    unsigned flags;              /**< NDN_FORW_* - c.f. <ndn/reg_mgnt.h> */
+    unsigned flags;              /**< NDN_FORW_* - c.f. <ndn-tlv/reg_mgnt.h> */
     int expires;                 /**< time remaining, in seconds */
     struct ndn_forwarding *next;
 };

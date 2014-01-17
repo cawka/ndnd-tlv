@@ -23,7 +23,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ndn/indexbuf.h>
+#include <ndn-tlv/indexbuf.h>
 
 #define ELEMENT size_t
 

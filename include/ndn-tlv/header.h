@@ -1,14 +1,12 @@
 /**
- * @file ndn/ndnd.h
- * 
- * Definitions pertaining to the NDNx daemon.
+ * @file ndn-tlv/header.h
  *
  * Part of the NDNx C Library.
  *
  * Portions Copyright (C) 2013 Regents of the University of California.
  * 
  * Based on the CCNx C Library by PARC.
- * Copyright (C) 2008, 2009 Palo Alto Research Center, Inc.
+ * Copyright (C) 2009 Palo Alto Research Center, Inc.
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version 2.1
@@ -22,23 +20,27 @@
  * Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef NDN_NDND_DEFINED
-#define NDN_NDND_DEFINED
+#ifndef NDN_HEADER_DEFINED
+#define NDN_HEADER_DEFINED
 
-#define NDN_DEFAULT_LOCAL_SOCKNAME "/tmp/.ndnd.sock"
-#define NDN_LOCAL_PORT_ENVNAME "NDN_LOCAL_PORT"
+#include <stddef.h>
+#include <ndn-tlv/charbuf.h>
 
-/**
- * ndnx registered port number
- * see http://www.iana.org/assignments/port-numbers
- */
-#define NDN_DEFAULT_UNICAST_PORT_NUMBER 6363U
-#define NDN_DEFAULT_UNICAST_PORT       "6363"
+struct ndn_header {
+    uintmax_t start;
+    uintmax_t count;
+    uintmax_t block_size;
+    uintmax_t length;
+    struct ndn_charbuf *root_digest;
+    struct ndn_charbuf *content_digest;
+};
 
-/**
- * Link adapters sign on by sending this greeting to ndnd.
- * Not for use over the wire.
- */
-#define NDN_EMPTY_PDU "NDN\202\000"
-#define NDN_EMPTY_PDU_LENGTH 5
+struct ndn_header *ndn_header_parse(const unsigned char *, size_t);
+
+void ndn_header_destroy(struct ndn_header **);
+
+int ndnb_append_header(struct ndn_charbuf *, const struct ndn_header *);
+
+struct ndn_header *ndn_get_header(struct ndn *, struct ndn_charbuf *, int);
+
 #endif

@@ -28,10 +28,10 @@
 
 extern "C" {
 #define ndn NDN_HANDLE_CANNOT_BE_USED_HERE
-#include <ndn/face_mgmt.h>
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/sockcreate.h>
+#include <ndn-tlv/face_mgmt.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/sockcreate.h>
 #undef ndn
 }
 

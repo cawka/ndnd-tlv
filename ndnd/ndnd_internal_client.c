@@ -33,14 +33,14 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/ndn_private.h>
-#include <ndn/hashtb.h>
-#include <ndn/keystore.h>
-#include <ndn/schedule.h>
-#include <ndn/sockaddrutil.h>
-#include <ndn/uri.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/ndn_private.h>
+#include <ndn-tlv/hashtb.h>
+#include <ndn-tlv/keystore.h>
+#include <ndn-tlv/schedule.h>
+#include <ndn-tlv/sockaddrutil.h>
+#include <ndn-tlv/uri.h>
 #include "ndnd_private.h"
 
 #if 0

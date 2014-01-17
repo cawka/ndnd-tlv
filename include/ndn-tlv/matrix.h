@@ -1,5 +1,5 @@
 /**
- * @file ndn/matrix.h
+ * @file ndn-tlv/matrix.h
  * 
  * Part of the NDNx C Library.
  *

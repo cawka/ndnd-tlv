@@ -1,5 +1,5 @@
 /**
- * @file ndn/face_mgmt.h
+ * @file ndn-tlv/face_mgmt.h
  *
  * Part of the NDNx C Library.
  *
@@ -24,8 +24,8 @@
 #define NDN_FACE_MGMT_DEFINED
 
 #include <stddef.h>
-#include <ndn/charbuf.h>
-#include <ndn/sockcreate.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/sockcreate.h>
 
 #define NDN_NO_FACEID (~0U)
 

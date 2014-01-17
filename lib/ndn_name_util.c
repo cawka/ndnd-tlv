@@ -22,11 +22,11 @@
  */
 #include <string.h>
 #include <stdlib.h>
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/coding.h>
-#include <ndn/indexbuf.h>
-#include <ndn/random.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/coding.h>
+#include <ndn-tlv/indexbuf.h>
+#include <ndn-tlv/random.h>
 
 /**
  * Reset charbuf to represent an empty Name in binary format.

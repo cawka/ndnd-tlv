@@ -1,5 +1,5 @@
 /**
- * @file ndn/merklepathasn1.h
+ * @file ndn-tlv/merklepathasn1.h
  * 
  * ASN.1 support routines for dealing with the Merkle paths
  * encapsulated in the digest info.

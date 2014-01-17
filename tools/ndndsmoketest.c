@@ -41,8 +41,8 @@
 #include "dummyin6.h"
 #endif
 
-#include <ndn/ndnd.h>
-#include <ndn/ndn_private.h>
+#include <ndn-tlv/ndnd.h>
+#include <ndn-tlv/ndn_private.h>
 
 #define CRLF "\r\n"
 #define HTTPVERSION "1.1"

@@ -29,8 +29,8 @@
 #include <signal.h>
 #include <unistd.h>
 
-#include <ndn/btree.h>
-#include <ndn/charbuf.h>
+#include <ndn-tlv/btree.h>
+#include <ndn-tlv/charbuf.h>
 
 static int bts_open(struct ndn_btree_io *, struct ndn_btree_node *);
 static int bts_read(struct ndn_btree_io *, struct ndn_btree_node *, unsigned);

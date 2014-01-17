@@ -1,5 +1,5 @@
 /**
- * @file ndn/indexbuf.h
+ * @file ndn-tlv/indexbuf.h
  * 
  * Expandable buffer of non-negative values.
  *

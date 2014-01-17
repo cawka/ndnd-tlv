@@ -1,5 +1,5 @@
 /**
- * @file ndn/keystore.h
+ * @file ndn-tlv/keystore.h
  *
  * KEYSTORE interface.
  *
@@ -30,7 +30,7 @@
 #define NDN_KEYSTORE_DEFINED
 
 #include <stddef.h>
-#include <ndn/charbuf.h>
+#include <ndn-tlv/charbuf.h>
 
 /*
  * opaque type for key storage

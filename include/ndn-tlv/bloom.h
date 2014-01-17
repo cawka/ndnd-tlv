@@ -1,5 +1,5 @@
 /**
- * @file ndn/bloom.h
+ * @file ndn-tlv/bloom.h
  *
  * Bloom filters.
  *

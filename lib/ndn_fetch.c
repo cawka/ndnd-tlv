@@ -35,7 +35,7 @@
  * handle interest timeouts.
  */
 
-#include <ndn/fetch.h>
+#include <ndn-tlv/fetch.h>
 
 #include <sys/types.h>
 #include <stdio.h>

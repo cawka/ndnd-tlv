@@ -52,17 +52,17 @@
     #include "dummyin6.h"
 #endif
 
-#include <ndn/bloom.h>
-#include <ndn/ndn.h>
-#include <ndn/ndn_private.h>
-#include <ndn/ndnd.h>
-#include <ndn/charbuf.h>
-#include <ndn/face_mgmt.h>
-#include <ndn/hashtb.h>
-#include <ndn/indexbuf.h>
-#include <ndn/schedule.h>
-#include <ndn/reg_mgmt.h>
-#include <ndn/uri.h>
+#include <ndn-tlv/bloom.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/ndn_private.h>
+#include <ndn-tlv/ndnd.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/face_mgmt.h>
+#include <ndn-tlv/hashtb.h>
+#include <ndn-tlv/indexbuf.h>
+#include <ndn-tlv/schedule.h>
+#include <ndn-tlv/reg_mgmt.h>
+#include <ndn-tlv/uri.h>
 
 #include "ndnd_private.h"
 

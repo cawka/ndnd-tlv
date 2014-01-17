@@ -22,7 +22,7 @@
  */
 #include <stdlib.h>
 #include <openssl/sha.h>
-#include <ndn/digest.h>
+#include <ndn-tlv/digest.h>
 
 struct ndn_digest {
     enum ndn_digest_id id;

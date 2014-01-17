@@ -26,8 +26,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <ndn/charbuf.h>
-#include <ndn/sockaddrutil.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/sockaddrutil.h>
 
 /**
  * Append a printable representation of sa (sans any port info) to the charbuf.

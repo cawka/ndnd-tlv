@@ -23,7 +23,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ndn/bloom.h>
+#include <ndn-tlv/bloom.h>
 
 struct ndn_bloom {
     int n;

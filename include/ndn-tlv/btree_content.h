@@ -1,5 +1,5 @@
 /**
- * @file ndn/btree_content.h
+ * @file ndn-tlv/btree_content.h
  *
  * Storage of a content index in a btree
  */
@@ -28,9 +28,9 @@
 #define NDN_BTREE_CONTENT_DEFINED
 
 #include <sys/types.h>
-#include <ndn/btree.h>
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
+#include <ndn-tlv/btree.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
 
 /**
  *  Structure of the entry payload within a leaf node.

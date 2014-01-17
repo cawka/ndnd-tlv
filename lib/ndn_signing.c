@@ -26,10 +26,10 @@
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <openssl/x509.h>
-#include <ndn/merklepathasn1.h>
-#include <ndn/ndn.h>
-#include <ndn/signing.h>
-#include <ndn/random.h>
+#include <ndn-tlv/merklepathasn1.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/signing.h>
+#include <ndn-tlv/random.h>
 
 struct ndn_sigc {
     EVP_MD_CTX context;
@@ -68,7 +68,7 @@ md_from_digest_and_pkey(const char *digest, const struct ndn_pkey *pkey)
 
     /* This encapsulates knowledge that the default digest algorithm for
      * signing is SHA256.  See also NDN_SIGNING_DEFAULT_DIGEST_ALGORITHM
-     * in ndn/ndn.h.  We could call OBJ_txt2nid(), but this would be rather
+     * in ndn-tlv/ndn.h.  We could call OBJ_txt2nid(), but this would be rather
      * inefficient.  If there were a place to stand for overall signing
      * initialization then that would be an appropriate place to do so.
      */

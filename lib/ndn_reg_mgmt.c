@@ -25,9 +25,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/reg_mgmt.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/reg_mgmt.h>
 
 struct ndn_forwarding_entry *
 ndn_forwarding_entry_parse(const unsigned char *p, size_t size)

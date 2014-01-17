@@ -1,5 +1,5 @@
 /**
- * @file ndn/charbuf.h
+ * @file ndn-tlv/charbuf.h
  * 
  * Expandable character buffer for counted sequences of arbitrary octets.
  *

@@ -25,11 +25,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <ndn/bloom.h>
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/uri.h>
-#include <ndn/ndn_private.h>
+#include <ndn-tlv/bloom.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/uri.h>
+#include <ndn-tlv/ndn_private.h>
 #include <sys/time.h>
 
 #define FF 0xff

@@ -1,13 +1,14 @@
 /**
- * @file ndn/seqwriter.h
- * @brief
+ * @file ndn-tlv/ndnd.h
  * 
+ * Definitions pertaining to the NDNx daemon.
+ *
  * Part of the NDNx C Library.
  *
  * Portions Copyright (C) 2013 Regents of the University of California.
  * 
  * Based on the CCNx C Library by PARC.
- * Copyright (C) 2010 Palo Alto Research Center, Inc.
+ * Copyright (C) 2008, 2009 Palo Alto Research Center, Inc.
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version 2.1
@@ -20,23 +21,24 @@
  * if not, write to the Free Software Foundation, Inc., 51 Franklin Street,
  * Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-#ifndef NDN_SEQWRITER_DEFINED
-#define NDN_SEQWRITER_DEFINED
 
-#include <stddef.h>
-struct ndn_seqwriter;
-struct ndn;
-struct ndn_charbuf;
+#ifndef NDN_NDND_DEFINED
+#define NDN_NDND_DEFINED
 
-struct ndn_seqwriter *ndn_seqw_create(struct ndn *h, struct ndn_charbuf *name);
-int ndn_seqw_possible_interest(struct ndn_seqwriter *w);
-int ndn_seqw_batch_start(struct ndn_seqwriter *w);
-int ndn_seqw_get_name(struct ndn_seqwriter *w, struct ndn_charbuf *nv);
-int ndn_seqw_write(struct ndn_seqwriter *w, const void *buf, size_t size);
-int ndn_seqw_batch_end(struct ndn_seqwriter *w);
-int ndn_seqw_set_block_limits(struct ndn_seqwriter *w, int l, int h);
-int ndn_seqw_set_freshness(struct ndn_seqwriter *w, int freshness);
-int ndn_seqw_close(struct ndn_seqwriter *w);
+#define NDN_DEFAULT_LOCAL_SOCKNAME "/tmp/.ndnd.sock"
+#define NDN_LOCAL_PORT_ENVNAME "NDN_LOCAL_PORT"
 
+/**
+ * ndnx registered port number
+ * see http://www.iana.org/assignments/port-numbers
+ */
+#define NDN_DEFAULT_UNICAST_PORT_NUMBER 6363U
+#define NDN_DEFAULT_UNICAST_PORT       "6363"
+
+/**
+ * Link adapters sign on by sending this greeting to ndnd.
+ * Not for use over the wire.
+ */
+#define NDN_EMPTY_PDU "NDN\202\000"
+#define NDN_EMPTY_PDU_LENGTH 5
 #endif

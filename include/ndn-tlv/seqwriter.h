@@ -1,8 +1,7 @@
 /**
- * @file ndn/extend_dict.h
- *
- * Dictionary extension routines
- *
+ * @file ndn-tlv/seqwriter.h
+ * @brief
+ * 
  * Part of the NDNx C Library.
  *
  * Portions Copyright (C) 2013 Regents of the University of California.
@@ -21,23 +20,23 @@
  * if not, write to the Free Software Foundation, Inc., 51 Franklin Street,
  * Fifth Floor, Boston, MA 02110-1301 USA.
  */
+ 
+#ifndef NDN_SEQWRITER_DEFINED
+#define NDN_SEQWRITER_DEFINED
 
-#ifndef NDN_EXTEND_DICT_DEFINED
-#define NDN_EXTEND_DICT_DEFINED
+#include <stddef.h>
+struct ndn_seqwriter;
+struct ndn;
+struct ndn_charbuf;
 
-#include <ndn/coding.h>
-
-/*
- * Deallocate a dictionary freeing each of the strings and the structure itself
- */
-
-void ndn_destroy_dict(struct ndn_dict **dp);
-
-/*
- * Create a dictionary that is a copy of the one passed in, extended with the
- * index and name pairs loaded from the file passed in.
- */
-int ndn_extend_dict(const char *dict_file, struct ndn_dict *d,
-                    struct ndn_dict **rdp);
+struct ndn_seqwriter *ndn_seqw_create(struct ndn *h, struct ndn_charbuf *name);
+int ndn_seqw_possible_interest(struct ndn_seqwriter *w);
+int ndn_seqw_batch_start(struct ndn_seqwriter *w);
+int ndn_seqw_get_name(struct ndn_seqwriter *w, struct ndn_charbuf *nv);
+int ndn_seqw_write(struct ndn_seqwriter *w, const void *buf, size_t size);
+int ndn_seqw_batch_end(struct ndn_seqwriter *w);
+int ndn_seqw_set_block_limits(struct ndn_seqwriter *w, int l, int h);
+int ndn_seqw_set_freshness(struct ndn_seqwriter *w, int freshness);
+int ndn_seqw_close(struct ndn_seqwriter *w);
 
 #endif

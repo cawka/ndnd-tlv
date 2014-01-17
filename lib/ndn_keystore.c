@@ -35,11 +35,11 @@
 #include <openssl/sha.h>
 #include <openssl/rand.h>
 
-#include <ndn/keystore.h>
-#include <ndn/charbuf.h>
-#include <ndn/ndn.h>
-#include <ndn/signing.h>
-#include <ndn/uri.h>
+#include <ndn-tlv/keystore.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/signing.h>
+#include <ndn-tlv/uri.h>
 
 struct ndn_keystore {
     int initialized;

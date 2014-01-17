@@ -1,12 +1,13 @@
 /**
- * @file ndn/header.h
- *
+ * @file sockaddrutil.h
+ * @brief sockaddr utilities
+ * 
  * Part of the NDNx C Library.
  *
  * Portions Copyright (C) 2013 Regents of the University of California.
  * 
  * Based on the CCNx C Library by PARC.
- * Copyright (C) 2009 Palo Alto Research Center, Inc.
+ * Copyright (C) 2010 Palo Alto Research Center, Inc.
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version 2.1
@@ -19,28 +20,14 @@
  * if not, write to the Free Software Foundation, Inc., 51 Franklin Street,
  * Fifth Floor, Boston, MA 02110-1301 USA.
  */
+ 
+#ifndef NDN_SOCKADDRUTIL_DEFINED
+#define NDN_SOCKADDRUTIL_DEFINED
 
-#ifndef NDN_HEADER_DEFINED
-#define NDN_HEADER_DEFINED
+#include <sys/socket.h>
+#include <ndn-tlv/charbuf.h>
 
-#include <stddef.h>
-#include <ndn/charbuf.h>
-
-struct ndn_header {
-    uintmax_t start;
-    uintmax_t count;
-    uintmax_t block_size;
-    uintmax_t length;
-    struct ndn_charbuf *root_digest;
-    struct ndn_charbuf *content_digest;
-};
-
-struct ndn_header *ndn_header_parse(const unsigned char *, size_t);
-
-void ndn_header_destroy(struct ndn_header **);
-
-int ndnb_append_header(struct ndn_charbuf *, const struct ndn_header *);
-
-struct ndn_header *ndn_get_header(struct ndn *, struct ndn_charbuf *, int);
+/* Append numeric printable representation, return port. */
+int ndn_charbuf_append_sockaddr(struct ndn_charbuf *, const struct sockaddr *);
 
 #endif

@@ -1,5 +1,5 @@
 /**
- * @file ndn/ndn.h
+ * @file ndn-tlv/ndn.h
  *
  * This is the low-level interface for NDNx clients.
  *
@@ -26,9 +26,9 @@
 #define NDN_NDN_DEFINED
 
 #include <stdint.h>
-#include <ndn/coding.h>
-#include <ndn/charbuf.h>
-#include <ndn/indexbuf.h>
+#include <ndn-tlv/coding.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/indexbuf.h>
 
 /**
  * A macro that clients may use to cope with an evolving API.

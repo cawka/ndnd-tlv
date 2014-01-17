@@ -34,7 +34,7 @@
 #include <netdb.h>
 #include <unistd.h>
 
-#include <ndn/sockcreate.h>
+#include <ndn-tlv/sockcreate.h>
 
 #if defined(NEED_GETADDRINFO_COMPAT)
     #include "getaddrinfo.h"

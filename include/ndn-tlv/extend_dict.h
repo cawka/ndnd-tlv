@@ -1,7 +1,8 @@
 /**
- * @file sockaddrutil.h
- * @brief sockaddr utilities
- * 
+ * @file ndn-tlv/extend_dict.h
+ *
+ * Dictionary extension routines
+ *
  * Part of the NDNx C Library.
  *
  * Portions Copyright (C) 2013 Regents of the University of California.
@@ -20,14 +21,23 @@
  * if not, write to the Free Software Foundation, Inc., 51 Franklin Street,
  * Fifth Floor, Boston, MA 02110-1301 USA.
  */
- 
-#ifndef NDN_SOCKADDRUTIL_DEFINED
-#define NDN_SOCKADDRUTIL_DEFINED
 
-#include <sys/socket.h>
-#include <ndn/charbuf.h>
+#ifndef NDN_EXTEND_DICT_DEFINED
+#define NDN_EXTEND_DICT_DEFINED
 
-/* Append numeric printable representation, return port. */
-int ndn_charbuf_append_sockaddr(struct ndn_charbuf *, const struct sockaddr *);
+#include <ndn-tlv/coding.h>
+
+/*
+ * Deallocate a dictionary freeing each of the strings and the structure itself
+ */
+
+void ndn_destroy_dict(struct ndn_dict **dp);
+
+/*
+ * Create a dictionary that is a copy of the one passed in, extended with the
+ * index and name pairs loaded from the file passed in.
+ */
+int ndn_extend_dict(const char *dict_file, struct ndn_dict *d,
+                    struct ndn_dict **rdp);
 
 #endif

@@ -29,9 +29,9 @@
 
 extern "C" {
 #define ndn NDN_HANDLE_CANNOT_BE_USED_HERE
-#include <ndn/reg_mgmt.h>
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
+#include <ndn-tlv/reg_mgmt.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
 #undef ndn
 }
 

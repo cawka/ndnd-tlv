@@ -1,5 +1,5 @@
 /**
- * @file ndn/hashtb.h
+ * @file ndn-tlv/hashtb.h
  * 
  * Hash table.
  *

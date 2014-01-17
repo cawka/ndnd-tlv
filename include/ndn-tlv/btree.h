@@ -1,5 +1,5 @@
 /**
- * @file ndn/btree.h
+ * @file ndn-tlv/btree.h
  * BTree
  */
 /* Part of the NDNx C Library.
@@ -26,8 +26,8 @@
 
 #include <stdio.h>
 #include <sys/types.h>
-#include <ndn/charbuf.h>
-#include <ndn/hashtb.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/hashtb.h>
 
 struct ndn_btree_io;
 struct ndn_btree_node;

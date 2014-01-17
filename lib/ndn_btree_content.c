@@ -22,11 +22,11 @@
  
 #include <stdint.h>
 #include <string.h>
-#include <ndn/btree.h>
-#include <ndn/btree_content.h>
-#include <ndn/bloom.h>
-#include <ndn/ndn.h>
-#include <ndn/uri.h>
+#include <ndn-tlv/btree.h>
+#include <ndn-tlv/btree_content.h>
+#include <ndn-tlv/bloom.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/uri.h>
 
 #ifndef MYFETCH
 #define MYFETCH(p, f) ndn_btree_fetchval(&((p)->f[0]), sizeof((p)->f))

@@ -24,7 +24,7 @@
 #define NDN_REG_MGMT_DEFINED
 
 #include <stddef.h>
-#include <ndn/charbuf.h>
+#include <ndn-tlv/charbuf.h>
 
 struct ndn_forwarding_entry {
     const char *action;

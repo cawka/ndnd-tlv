@@ -28,11 +28,11 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <ndn/ndn.h>
-#include <ndn/ndnd.h>
-#include <ndn/charbuf.h>
-#include <ndn/hashtb.h>
-#include <ndn/uri.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/ndnd.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/hashtb.h>
+#include <ndn-tlv/uri.h>
 
 #include "ndnd_private.h"
 

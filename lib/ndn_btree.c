@@ -26,10 +26,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ndn/charbuf.h>
-#include <ndn/hashtb.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/hashtb.h>
 
-#include <ndn/btree.h>
+#include <ndn-tlv/btree.h>
 
 static void
 ndn_btree_update_cached_parent(struct ndn_btree *btree,

@@ -28,7 +28,7 @@
 #define NDNS_DEFINED
 
 #include <stddef.h>
-#include <ndn/charbuf.h>
+#include <ndn-tlv/charbuf.h>
 
 #define SLICE_VERSION 20110614
 

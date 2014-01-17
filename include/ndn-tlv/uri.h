@@ -1,5 +1,5 @@
 /**
- * @file ndn/uri.h
+ * @file ndn-tlv/uri.h
  * 
  * ndn-scheme uri conversions.
  *
@@ -25,7 +25,7 @@
 #ifndef NDN_URI_DEFINED
 #define NDN_URI_DEFINED
 
-#include <ndn/charbuf.h>
+#include <ndn-tlv/charbuf.h>
 
 /* Conversion from ndnb name component to percent-escaped uri component */
 void

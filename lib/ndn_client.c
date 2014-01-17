@@ -38,18 +38,18 @@
 #include <unistd.h>
 #include <openssl/evp.h>
 
-#include <ndn/ndn.h>
-#include <ndn/ndn_private.h>
-#include <ndn/ndnd.h>
-#include <ndn/charbuf.h>
-#include <ndn/coding.h>
-#include <ndn/digest.h>
-#include <ndn/hashtb.h>
-#include <ndn/reg_mgmt.h>
-#include <ndn/schedule.h>
-#include <ndn/signing.h>
-#include <ndn/keystore.h>
-#include <ndn/uri.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/ndn_private.h>
+#include <ndn-tlv/ndnd.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/coding.h>
+#include <ndn-tlv/digest.h>
+#include <ndn-tlv/hashtb.h>
+#include <ndn-tlv/reg_mgmt.h>
+#include <ndn-tlv/schedule.h>
+#include <ndn-tlv/signing.h>
+#include <ndn-tlv/keystore.h>
+#include <ndn-tlv/uri.h>
 
 /* Forward struct declarations */
 struct interests_by_prefix;

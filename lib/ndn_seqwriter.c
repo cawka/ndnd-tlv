@@ -25,8 +25,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <ndn/ndn.h>
-#include <ndn/seqwriter.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/seqwriter.h>
 
 #define MAX_DATA_SIZE 4096
 

@@ -1,5 +1,5 @@
 /**
- * @file ndn/schedule.h
+ * @file ndn-tlv/schedule.h
  * 
  * Event scheduling.
  *

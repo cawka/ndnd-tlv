@@ -25,11 +25,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/coding.h>
-#include <ndn/face_mgmt.h>
-#include <ndn/sockcreate.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/coding.h>
+#include <ndn-tlv/face_mgmt.h>
+#include <ndn-tlv/sockcreate.h>
 
 /**
  * Parse a ndnb-ecoded FaceInstance into an internal representation

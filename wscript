@@ -62,9 +62,9 @@ def configure(conf):
     conf.check_boost(lib="system iostreams")
 
 def build (bld):
-    bld (target = 'ndn',
-         vnum = "1.0.0",
-         features=['c', 'cxx', 'cxxshlib', 'cshlib'],
+    bld (target = 'ndn-tlv',
+         # vnum = "1.0.0",
+         features=['c', 'cxx', 'cxxstlib', 'cstlib'],
          source = bld.path.ant_glob(['lib/**/*.c', 'lib/**/*.cpp', 'tlv-hack/**/*.cpp']),
          use = 'OPENSSL BOOST NDN_CPP',
          includes = "include",
@@ -73,30 +73,30 @@ def build (bld):
     bld (target="bin/ndnd-tlv",
          features=['c', 'cxx', 'cxxprogram'],
          source = bld.path.ant_glob(['ndnd/**/*.c', 'ndnd/**/*.cpp']),
-         use = 'ndn OPENSSL BOOST NDN_CPP',
+         use = 'ndn-tlv OPENSSL BOOST NDN_CPP',
          includes = "include",
         )
 
     for app in bld.path.ant_glob('tools/*', dir=True):
         if os.path.isdir(app.abspath()):
             bld(features=['c', 'cxx', 'cxxprogram'],
-                target = 'bin/%s/%s' % (str(app), str(app)),
+                target = 'bin/%s' % (str(app)),
                 source = app.ant_glob(['**/*.c', '**/*.cpp']),
-                use = 'ndn BOOST OPENSSL NDN_CPP RESOLV',
+                use = 'ndn-tlv BOOST OPENSSL NDN_CPP RESOLV',
                 includes = "include",
                 )
 
     for app in bld.path.ant_glob('tools/*.c'):
         bld(features=['c', 'cxxprogram'],
-            target = app.change_ext('','.c'),
+            target = 'bin/%s' % (str(app.change_ext('','.c'))),
             source = app,
-            use = 'ndn BOOST OPENSSL NDN_CPP',
+            use = 'ndn-tlv BOOST OPENSSL NDN_CPP',
             includes = "include",
             )
 
     bld (features = "subst",
          source = bld.path.ant_glob(['tools/**/*.sh']),
-         target = [node.change_ext('', '.sh') for node in bld.path.ant_glob(['tools/**/*.sh'])],
+         target = ['bin/%s' % node.change_ext('', '.sh') for node in bld.path.ant_glob(['tools/**/*.sh'])],
          install_path = "${BINDIR}",
          chmod = 0755,
         )
@@ -104,7 +104,7 @@ def build (bld):
     bld.install_files(bld.env['INCLUDEDIR'], bld.path.ant_glob(['include/**/*.h']), 
                       relative_trick=True, cwd=bld.path.find_node('include'))
     
-    bld.install_files('%s/ndn' % bld.env['INCLUDEDIR'], bld.path.ant_glob(['tlv-hack/**/*.h', 'tlv-hack/**/*.hpp']), 
+    bld.install_files('%s/ndn-tlv' % bld.env['INCLUDEDIR'], bld.path.ant_glob(['tlv-hack/**/*.h', 'tlv-hack/**/*.hpp']), 
                       relative_trick=True, cwd=bld.path.find_node('tlv-hack'))
 
 @Configure.conf

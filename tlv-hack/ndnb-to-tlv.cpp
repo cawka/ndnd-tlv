@@ -10,10 +10,10 @@
 
 extern "C" {
 #define ndn NDN_HANDLE_CANNOT_BE_USED_HERE
-#include <ndn/ndnd.h>
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/coding.h>
+#include <ndn-tlv/ndnd.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/coding.h>
 
 #include "../ndnd/ndnd_private.h"
 #undef ndn

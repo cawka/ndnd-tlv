@@ -3,7 +3,7 @@
  * Framework to generate implementation of ASN.1 functions to deal with Merkle paths
  */
 
-#include <ndn/merklepathasn1.h>
+#include <ndn-tlv/merklepathasn1.h>
 
 ASN1_SEQUENCE(MP_info) = {
     ASN1_SIMPLE(MP_info, node, ASN1_INTEGER),

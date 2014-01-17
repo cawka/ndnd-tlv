@@ -1,5 +1,5 @@
 /**
- * @file ndn/digest.h
+ * @file ndn-tlv/digest.h
  * 
  * Message digest interface.
  *

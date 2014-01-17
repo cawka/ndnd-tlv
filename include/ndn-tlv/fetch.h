@@ -1,5 +1,5 @@
 /*
- * ndn/fetch.h
+ * ndn-tlv/fetch.h
  * 
  * Part of the NDNx C Library.
  *
@@ -21,7 +21,7 @@
  */
 
 /**
- * @file ndn/fetch.h
+ * @file ndn-tlv/fetch.h
  * Streaming access for fetching segmented NDNx data.
  *
  * Supports multiple streams from a single connection and
@@ -32,8 +32,8 @@
 #define NDN_FETCH_DEFINED
 
 #include <stdio.h>
-#include <ndn/ndn.h>
-#include <ndn/uri.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/uri.h>
 
 /**
  * Creates a new ndn_fetch object using the given ndn connection.

@@ -22,10 +22,10 @@
  */
 #include <string.h>
 #include <stdlib.h>
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/coding.h>
-#include <ndn/indexbuf.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/coding.h>
+#include <ndn-tlv/indexbuf.h>
 
 struct ndn_buf_decoder *
 ndn_buf_decoder_start(struct ndn_buf_decoder *d,

@@ -25,12 +25,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/coding.h>
-#include <ndn/indexbuf.h>
-#include <ndn/signing.h>
-#include <ndn/ndn_private.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/coding.h>
+#include <ndn-tlv/indexbuf.h>
+#include <ndn-tlv/signing.h>
+#include <ndn-tlv/ndn_private.h>
 
 /**
  * Create SignedInfo.

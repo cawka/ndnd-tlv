@@ -37,9 +37,9 @@
 #define AI_ADDRCONFIG 0 /*IEEE Std 1003.1-2001/Cor 1-2002, item XSH/TC1/D6/20*/
 #endif
 
-#include <ndn/ndnd.h>
-#include <ndn/ndn_private.h>
-#include <ndn/charbuf.h>
+#include <ndn-tlv/ndnd.h>
+#include <ndn-tlv/ndn_private.h>
+#include <ndn-tlv/charbuf.h>
 
 /**
  * Set up a unix-domain socket address for contacting ndnd.

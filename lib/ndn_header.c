@@ -25,11 +25,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/coding.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/coding.h>
 
-#include <ndn/header.h>
+#include <ndn-tlv/header.h>
 
 const unsigned char meta[8] = {NDN_MARKER_CONTROL, '.', 'M', 'E', 'T', 'A', '.', 'M'};
 
@@ -147,7 +147,7 @@ ndn_get_header(struct ndn *h, struct ndn_charbuf *name, int timeout)
     ndn_charbuf_append_charbuf(hn, name);
     /*
      * Requires consistency with metadata profile in
-     * javasrc/src/main/org/ndnx/ndn/profiles/metadata/MetadataProfile.java
+     * javasrc/src/main/org/ndnx/ndn-tlv/profiles/metadata/MetadataProfile.java
      */
     ndn_name_append(hn, meta, sizeof(meta));
     ndn_name_append_str(hn, ".header");

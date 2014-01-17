@@ -21,10 +21,10 @@
  * Fifth Floor, Boston, MA 02110-1301 USA.
  */
 #include <string.h>
-#include <ndn/ndn.h>
-#include <ndn/charbuf.h>
-#include <ndn/coding.h>
-#include <ndn/uri.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/coding.h>
+#include <ndn-tlv/uri.h>
 
 /*********
 RFC 3986                   URI Generic Syntax               January 2005

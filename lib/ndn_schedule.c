@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h>
-#include <ndn/schedule.h>
+#include <ndn-tlv/schedule.h>
 
 /**
  * Use this unsigned type to keep track of time in the heap.

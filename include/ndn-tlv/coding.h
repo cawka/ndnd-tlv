@@ -1,5 +1,5 @@
 /**
- * @file ndn/coding.h
+ * @file ndn-tlv/coding.h
  * 
  * Details of the ndn binary wire encoding.
  *

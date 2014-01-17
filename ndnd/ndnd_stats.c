@@ -34,15 +34,15 @@
 #include <sys/utsname.h>
 #include <time.h>
 #include <unistd.h>
-#include <ndn/ndn.h>
-#include <ndn/ndnd.h>
-#include <ndn/charbuf.h>
-#include <ndn/coding.h>
-#include <ndn/indexbuf.h>
-#include <ndn/schedule.h>
-#include <ndn/sockaddrutil.h>
-#include <ndn/hashtb.h>
-#include <ndn/uri.h>
+#include <ndn-tlv/ndn.h>
+#include <ndn-tlv/ndnd.h>
+#include <ndn-tlv/charbuf.h>
+#include <ndn-tlv/coding.h>
+#include <ndn-tlv/indexbuf.h>
+#include <ndn-tlv/schedule.h>
+#include <ndn-tlv/sockaddrutil.h>
+#include <ndn-tlv/hashtb.h>
+#include <ndn-tlv/uri.h>
 
 #include "ndnd_private.h"
 

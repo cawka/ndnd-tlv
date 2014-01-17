@@ -1,5 +1,5 @@
 /**
- * @file ndn/ndn_private.h
+ * @file ndn-tlv/ndn_private.h
  *
  * Additional operations that are irrevalent for most clients.
  *
