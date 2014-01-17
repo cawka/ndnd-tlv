@@ -34,11 +34,11 @@ def configure(conf):
                  ]
 
         conf.add_supported_cxxflags (cxxflags = flags)
-        conf.add_supported_cflags (cflags = flags)
+        conf.add_supported_cflags (cflags = flags + ['-std=gnu99'])
     else:
         flags = ['-O3', '-g', '-Wno-tautological-compare', '-Wno-unused-function', '-Wno-deprecated-declarations']
         conf.add_supported_cxxflags (cxxflags = flags)
-        conf.add_supported_cflags (cflags = flags)
+        conf.add_supported_cflags (cflags = flags + ['-std=gnu99'])
 
     if conf.options.use_cxx11:
         conf.add_supported_cxxflags(cxxflags = ['-std=c++11', '-std=c++0x'])
@@ -64,7 +64,7 @@ def configure(conf):
 def build (bld):
     bld (target = 'ndn',
          vnum = "1.0.0",
-         features=['c', 'cxx', 'cxxshlib'],
+         features=['c', 'cxx', 'cxxshlib', 'cshlib'],
          source = bld.path.ant_glob(['lib/**/*.c', 'lib/**/*.cpp', 'tlv-hack/**/*.cpp']),
          use = 'OPENSSL BOOST NDN_CPP',
          includes = "include",

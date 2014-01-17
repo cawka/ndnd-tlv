@@ -51,6 +51,7 @@ using boost::tokenizer;
 using boost::escaped_list_separator;
 
 #include "ndnd-id-fetcher.hpp"
+#include <ndn-cpp/security/signature-sha256-with-rsa.hpp>
 
 namespace ndn {
 
@@ -438,8 +439,14 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
                                     const std::string &cmd_mcastttl, const std::string &cmd_mcastif,
                                     int freshness)
 {
-  struct addrinfo hints = {.ai_family = AF_UNSPEC, .ai_flags = (AI_ADDRCONFIG)};
-  struct addrinfo mcasthints = {.ai_family = AF_UNSPEC, .ai_flags = (AI_ADDRCONFIG | AI_NUMERICHOST)};
+  struct addrinfo hints;
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_flags = (AI_ADDRCONFIG);
+
+  struct addrinfo mcasthints;
+  mcasthints.ai_family = AF_UNSPEC;
+  mcasthints.ai_flags = (AI_ADDRCONFIG | AI_NUMERICHOST);
+
   struct addrinfo *raddrinfo = NULL;
   struct addrinfo *mcastifaddrinfo = NULL;
   char rhostnamebuf [NI_MAXHOST];

@@ -20,7 +20,7 @@ extern "C" {
 }
 
 #include "tlv-to-ndnb.hpp"
-#include <ndn-cpp/security/signature/signature-sha256-with-rsa.hpp>
+#include <ndn-cpp/security/signature-sha256-with-rsa.hpp>
 
 namespace ndn {
 
