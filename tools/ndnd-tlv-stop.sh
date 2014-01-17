@@ -15,7 +15,7 @@
 # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.
 #
-# This script should be installed in the same place as ndnd, ndndc, ndndsmoketest, ...
+# This script should be installed in the same place as ndnd-tlv, ndnd2c, ndndsmoketest, ...
 # adjust the path to get consistency.
 D=`dirname "$0"`
 export PATH="$D:$PATH"

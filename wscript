@@ -7,7 +7,7 @@ import os
 
 def options(opt):
     opt.load('compiler_c compiler_cxx gnu_dirs')
-    opt.load('openssl boost', tooldir=['waf-tools'])
+    opt.load('ndnx boost', tooldir=['waf-tools'])
 
     opt = opt.add_option_group('NDN TLV Daemon Options')
     opt.add_option('--debug',action='store_true',default=False,dest='debug',help='''debugging mode''')
@@ -17,7 +17,7 @@ def options(opt):
                    help='''Enable C++11 compiler features''')
 
 def configure(conf):
-    conf.load("compiler_c compiler_cxx gnu_dirs openssl boost")
+    conf.load("compiler_c compiler_cxx gnu_dirs ndnx boost")
 
     conf.find_program('sh')
 
@@ -46,8 +46,9 @@ def configure(conf):
     conf.define ("PACKAGE_BUGREPORT", "ndn-lib@lists.cs.ucla.edu")
     conf.define ("PACKAGE_NAME", NAME)
     conf.define ("PACKAGE_VERSION", VERSION)
-    # conf.define ("PACKAGE_URL", "https://github.com/named-data/ndn-cpp")
+    conf.define ("PACKAGE_URL", "https://github.com/named-data/ndnd-tlv")
 
+    conf.check_ndnx()
     conf.check_openssl()
 
     if not conf.options.ndn_cpp_dir:
@@ -63,17 +64,16 @@ def configure(conf):
 
 def build (bld):
     bld (target = 'ndn-tlv',
-         # vnum = "1.0.0",
          features=['c', 'cxx', 'cxxstlib', 'cstlib'],
          source = bld.path.ant_glob(['lib/**/*.c', 'lib/**/*.cpp', 'tlv-hack/**/*.cpp']),
-         use = 'OPENSSL BOOST NDN_CPP',
+         use = 'SSL BOOST NDN_CPP',
          includes = "include",
          )
 
     bld (target="bin/ndnd-tlv",
          features=['c', 'cxx', 'cxxprogram'],
          source = bld.path.ant_glob(['ndnd/**/*.c', 'ndnd/**/*.cpp']),
-         use = 'ndn-tlv OPENSSL BOOST NDN_CPP',
+         use = 'ndn-tlv SSL BOOST NDN_CPP',
          includes = "include",
         )
 
@@ -82,7 +82,7 @@ def build (bld):
             bld(features=['c', 'cxx', 'cxxprogram'],
                 target = 'bin/%s' % (str(app)),
                 source = app.ant_glob(['**/*.c', '**/*.cpp']),
-                use = 'ndn-tlv BOOST OPENSSL NDN_CPP RESOLV',
+                use = 'ndn-tlv BOOST SSL NDN_CPP RESOLV',
                 includes = "include",
                 )
 
@@ -90,7 +90,7 @@ def build (bld):
         bld(features=['c', 'cxxprogram'],
             target = 'bin/%s' % (str(app.change_ext('','.c'))),
             source = app,
-            use = 'ndn-tlv BOOST OPENSSL NDN_CPP',
+            use = 'ndn-tlv BOOST SSL NDN_CPP',
             includes = "include",
             )
 

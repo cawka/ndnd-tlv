@@ -15,10 +15,10 @@
 # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 # FOR A PARTICULAR PURPOSE.
 #
-# This script should be installed in the same place as ndnd, ndndc, ndndsmoketest, ...
+# This script should be installed in the same place as ndnd-tlv, ndnd2c, ndndsmoketest, ...
 # adjust the path to get consistency.
 Usage () {
-	echo $0 [-T host] - display the status of a running ndnd >&2
+	echo $0 [-T host] - display the status of a running ndnd-tlv >&2
 	exit 1
 }
 

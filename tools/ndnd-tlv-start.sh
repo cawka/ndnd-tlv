@@ -17,7 +17,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 
-# This script should be installed in the same place as ndnd, ndndc, ndndsmoketest, ...
+# This script should be installed in the same place as ndnd-tlv, ndnd2c, ndndsmoketest, ...
 # adjust the path to get consistency.
 D=`dirname "$0"`
 export PATH="$D:$PATH"
@@ -58,8 +58,8 @@ else
         StuffPreload 2> /dev/null
 fi
 
-# Run ndndc if a static config file is present.
-test -f $HOME/.ndnx/ndnd.conf && ndndc -f $HOME/.ndnx/ndnd.conf
+# Run ndnd2c if a static config file is present.
+test -f $HOME/.ndnx/ndnd.conf && ndnd2c -f $HOME/.ndnx/ndnd.conf
 
 # Start a repository as well, if a global prefix has been configured.
 if [ "$NDNR_GLOBAL_PREFIX" != "" ]
