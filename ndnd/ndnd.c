@@ -5120,7 +5120,7 @@ process_input(struct ndnd_handle *h, int fd)
             struct ndn_charbuf *msg;
             ssize_t length;
 
-            msg = charbuf_obtain(h);
+            msg = ndn_charbuf_create();
             length = tlv_to_ndnb(buf, res, msg);
 
             while (length > 0) {
@@ -5139,8 +5139,7 @@ process_input(struct ndnd_handle *h, int fd)
               length = tlv_to_ndnb(buf + msgstart, res - msgstart, msg);
             }
             
-            ndn_charbuf_reset(msg);
-            charbuf_release(h, msg);
+            ndn_charbuf_destroy(&msg);
             // TLV-hack end
           }
         else
