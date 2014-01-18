@@ -40,6 +40,14 @@ interest_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
     {
       selectors_tlv_to_ndnb(*val, ndnb);
     }
+  else
+    {
+      // due to change of the semantics, when TLV selectors are not present, enable NDNb selector to allow stale data
+      
+      ndn_charbuf_append_tt(ndnb, NDN_DTAG_AnswerOriginKind, NDN_DTAG);
+      ndnb_append_number(ndnb, NDN_AOK_DEFAULT | NDN_AOK_STALE);
+      ndn_charbuf_append_closer(ndnb); /* </AnswerOriginKind> */
+    }
 
   // Scope
   val = block.find(Tlv::Scope);
@@ -170,9 +178,9 @@ selectors_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
   val = block.find(Tlv::MustBeFresh);
   if (val != block.getAll().end())
     {
-      ndn_charbuf_append_tt(ndnb, NDN_DTAG_AnswerOriginKind, NDN_DTAG);
-      ndnb_append_number(ndnb, NDN_AOK_DEFAULT);
-      ndn_charbuf_append_closer(ndnb); /* </AnswerOriginKind> */
+      // ndn_charbuf_append_tt(ndnb, NDN_DTAG_AnswerOriginKind, NDN_DTAG);
+      // ndnb_append_number(ndnb, NDN_AOK_DEFAULT);
+      // ndn_charbuf_append_closer(ndnb); /* </AnswerOriginKind> */
     }
   else
     {
