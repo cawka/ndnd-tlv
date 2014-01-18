@@ -5111,8 +5111,8 @@ process_input(struct ndnd_handle *h, int fd)
         // 0x01 0xD2  NDNb Interest
         // 0x04 0x82  NDNb Data
         
-        if ((buf[0] == 0x01 && buf[1] != 0xD2) || // TLV's Interest
-            buf[0] == 0x02)   // TLV's Data
+        if ((face->inbuf->buf[0] == 0x01 && face->inbuf->buf[1] != 0xD2) || // TLV's Interest
+            face->inbuf->buf[0] == 0x02)   // TLV's Data
           {
             face->flags |= NDN_FACE_TLV;
             
@@ -5121,7 +5121,9 @@ process_input(struct ndnd_handle *h, int fd)
             ssize_t length;
 
             msg = ndn_charbuf_create();
-            length = tlv_to_ndnb(buf, res, msg);
+            length = tlv_to_ndnb(face->inbuf->buf,
+                                 face->inbuf->length,
+                                 msg);
 
             while (length > 0) {
               process_input_message(h, source,
@@ -5136,7 +5138,9 @@ process_input(struct ndnd_handle *h, int fd)
                 return;
               }
 
-              length = tlv_to_ndnb(buf + msgstart, res - msgstart, msg);
+              length = tlv_to_ndnb(face->inbuf->buf + msgstart,
+                                   face->inbuf->length - msgstart,
+                                   msg);
             }
             
             ndn_charbuf_destroy(&msg);
