@@ -51,7 +51,7 @@ using boost::tokenizer;
 using boost::escaped_list_separator;
 
 #include "ndnd-id-fetcher.hpp"
-#include <ndn-cpp/security/signature-sha256-with-rsa.hpp>
+#include <ndn-cpp-dev/security/signature-sha256-with-rsa.hpp>
 
 namespace ndn {
 

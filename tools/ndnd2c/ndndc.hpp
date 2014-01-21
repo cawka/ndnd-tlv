@@ -24,11 +24,11 @@
 #ifndef NDNDC_HPP
 #define NDNDC_HPP
 
-#include <ndn-cpp/face.hpp>
+#include <ndn-cpp-dev/face.hpp>
 
-#include <ndn-cpp/forwarding-entry.hpp>
-#include <ndn-cpp/status-response.hpp>
-#include <ndn-cpp/face-instance.hpp>
+#include <ndn-cpp-dev/forwarding-entry.hpp>
+#include <ndn-cpp-dev/status-response.hpp>
+#include <ndn-cpp-dev/face-instance.hpp>
 
 namespace ndn {
 

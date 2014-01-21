@@ -52,7 +52,7 @@ def configure(conf):
     conf.check_openssl()
 
     if not conf.options.ndn_cpp_dir:
-        conf.check_cxx(lib='ndn-cpp', uselib_store='NDN_CPP', mandatory=True)
+        conf.check_cfg(package='libndn-cpp-dev', args=['--cflags', '--libs'], uselib_store='NDN_CPP', mandatory=True)
     else:
         conf.check_cxx(lib='ndn-cpp', uselib_store='NDN_CPP', 
                        cxxflags="-I%s/include" % conf.options.ndn_cpp_dir,
