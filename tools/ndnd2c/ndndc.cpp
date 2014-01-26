@@ -695,6 +695,7 @@ Controller::startFaceAction(ptr_lib::shared_ptr<FaceInstance> entry,
   Interest interest(interestName);
   interest.setScope(1);
   interest.setInterestLifetime(1000);
+  interest.setMustBeFresh(true);
 
   m_face.expressInterest(interest,
                          func_lib::bind(onFaceActionSuccess, onSuccess, _2),
@@ -725,6 +726,7 @@ Controller::startPrefixAction(ptr_lib::shared_ptr<ForwardingEntry> entry,
   Interest interest(interestName);
   interest.setScope(1);
   interest.setInterestLifetime(1000);
+  interest.setMustBeFresh(true);
 
   m_face.expressInterest(interest,
                          func_lib::bind(onPrefixActionSuccess, onSuccess, _2),
