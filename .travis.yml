@@ -12,11 +12,11 @@ before_install:
 install:
   - travis_retry git clone git://github.com/cawka/ndn-cpp ndn-cpp
   - cd ndn-cpp
-  - autoreconf -f --install
-  - ./configure --without-c++11 --with-system-boost
-  - make
-  - sudo make install
-  - cd .. 
+  - ./waf configure
+  - ./waf -j1
+  - sudo ./waf install
+  - cd ..
 script:
   - ./waf configure
   - ./waf -j1
+  - sudo ./waf install
