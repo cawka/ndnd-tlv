@@ -52,6 +52,7 @@ using boost::escaped_list_separator;
 
 #include "ndnd-id-fetcher.hpp"
 #include <ndn-cpp-dev/security/signature-sha256-with-rsa.hpp>
+#include <ndn-cpp-dev/util/random.hpp>
 
 namespace ndn {
 
@@ -677,6 +678,7 @@ Controller::startFaceAction(ptr_lib::shared_ptr<FaceInstance> entry,
 {
   // Set the ForwardingEntry as the content of a Data packet and sign.
   Data data;
+  data.setName(Name().appendVersion(random::generateWord32()));
   data.setContent(entry->wireEncode());
   
   // Create an empty signature, since nobody going to verify it for now
@@ -708,6 +710,7 @@ Controller::startPrefixAction(ptr_lib::shared_ptr<ForwardingEntry> entry,
 {
   // Set the ForwardingEntry as the content of a Data packet and sign.
   Data data;
+  data.setName(Name().appendVersion(random::generateWord32()));
   data.setContent(entry->wireEncode());
   
   // Create an empty signature, since nobody going to verify it for now
