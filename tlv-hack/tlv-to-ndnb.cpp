@@ -114,7 +114,7 @@ name_to_ndnb(const Name &name, ndn_charbuf *ndnb)
   for (Name::const_iterator i = name.begin(); i != name.end(); ++i)
     {
       // Component
-      ndnb_append_tagged_blob(ndnb, NDN_DTAG_Component, i->getValue().buf(), i->getValue().size());
+      ndnb_append_tagged_blob(ndnb, NDN_DTAG_Component, (i->value_size() > 0) ? i->value() : 0, i->value_size());
     }
   
   ndn_charbuf_append_closer(ndnb); /* </Name> */
