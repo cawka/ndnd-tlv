@@ -1,7 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil -*- */
 /**
  * Copyright (C) 2013 Regents of the University of California.
- * @author: Jeff Thompson <jefft0@remap.ucla.edu>
  * See COPYING for copyright and distribution information.
  */
 
@@ -37,14 +36,14 @@ public:
    * @param data
    */
   inline void 
-  operator()(const ptr_lib::shared_ptr<const Interest>& interest, const ptr_lib::shared_ptr<Data>& ndndIdData);
+  operator()(const Interest& interest, Data& ndndIdData);
 
   /**
    * We timed out fetching the ndnd ID.
    * @param interest
    */
   inline void 
-  operator()(const ptr_lib::shared_ptr<const Interest>& timedOutInterest);
+  operator()(const Interest& timedOutInterest);
 
 private:
   Buffer &ndndId_;
@@ -53,12 +52,12 @@ private:
 };
 
 void 
-NdndIdFetcher::operator()(const ptr_lib::shared_ptr<const Interest>& interest, const ptr_lib::shared_ptr<Data>& ndndIdData)
+NdndIdFetcher::operator()(const Interest& interest, Data& ndndIdData)
 {
-  if (ndndIdData->getSignature().getType() == Signature::Sha256WithRsa)
+  if (ndndIdData.getSignature().getType() == Signature::Sha256WithRsa)
     {
       ndndId_.resize(32);
-      ndn_digestSha256(ndndIdData->getContent().value(), ndndIdData->getContent().value_size(), ndndId_.buf());
+      ndn_digestSha256(ndndIdData.getContent().value(), ndndIdData.getContent().value_size(), ndndId_.buf());
       onSuccess_();
     }
   else
@@ -66,7 +65,7 @@ NdndIdFetcher::operator()(const ptr_lib::shared_ptr<const Interest>& interest, c
 }
 
 void 
-NdndIdFetcher::operator()(const ptr_lib::shared_ptr<const Interest>& timedOutInterest)
+NdndIdFetcher::operator()(const Interest& timedOutInterest)
 {
   onFailure_();
 }

@@ -55,6 +55,7 @@ using boost::escaped_list_separator;
 #include <ndn-cpp-dev/util/random.hpp>
 
 namespace ndn {
+namespace ndndc {
 
 Controller::Controller(Controller::OnReady onReady,
                        Controller::OnFailure onFailure,
@@ -130,12 +131,12 @@ getNextToken(tokenizer<escaped_list_separator<char> >::iterator &token, tokenize
 }
 
 void
-NullPrefixAction(ptr_lib::shared_ptr<ForwardingEntry> prefix)
+NullPrefixAction(shared_ptr<ForwardingEntry> prefix)
 {
 }
 
 void
-NullFaceAction(ptr_lib::shared_ptr<FaceInstance> prefix)
+NullFaceAction(shared_ptr<FaceInstance> prefix)
 {
 }
 
@@ -162,16 +163,16 @@ Controller::add(int check_only,
     std::string cmd_mcastttl = getNextToken(token, cmd_tokens);
     std::string cmd_mcastif  = getNextToken(token, cmd_tokens);
 
-    ptr_lib::shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
+    shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
                                                                      cmd_mcastttl, cmd_mcastif, m_lifetime);
-    ptr_lib::shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry(cmd_uri,
+    shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry(cmd_uri,
                                                                              cmd_flags, m_lifetime);
     prefix->setAction("prefixreg");
     
     if (!check_only) {
       if (!boost::iequals(cmd_proto, "face")) {
         face->setAction("newface");
-        startFaceAction(face, func_lib::bind(&Controller::add_or_del_step2, this, _1, prefix));
+        startFaceAction(face, bind(&Controller::add_or_del_step2, this, _1, prefix));
       }
       else {
         add_or_del_step2(face, prefix);
@@ -188,7 +189,7 @@ Controller::add(int check_only,
 }
 
 void
-Controller::add_or_del_step2(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix)
+Controller::add_or_del_step2(shared_ptr<FaceInstance> face, shared_ptr<ForwardingEntry> prefix)
 {
   prefix->setFaceId(face->getFaceId());
   startPrefixAction(prefix, NullPrefixAction);
@@ -210,16 +211,16 @@ Controller::del(int check_only,
     std::string cmd_mcastttl = getNextToken(token, cmd_tokens);
     std::string cmd_mcastif  = getNextToken(token, cmd_tokens);
 
-    ptr_lib::shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
+    shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
                                                                      cmd_mcastttl, cmd_mcastif, m_lifetime);
-    ptr_lib::shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry(cmd_uri,
+    shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry(cmd_uri,
                                                                              cmd_flags, m_lifetime);
     prefix->setAction("unreg");
 
     if (!check_only) {
       if (!boost::iequals(cmd_proto, "face")) {
         face->setAction("newface");
-        startFaceAction(face, func_lib::bind(&Controller::add_or_del_step2, this, _1, prefix));
+        startFaceAction(face, bind(&Controller::add_or_del_step2, this, _1, prefix));
       }
       else {
         add_or_del_step2(face, prefix);
@@ -251,7 +252,7 @@ Controller::create(int check_only,
     std::string cmd_mcastttl = getNextToken(token, cmd_tokens);
     std::string cmd_mcastif  = getNextToken(token, cmd_tokens);
 
-    ptr_lib::shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
+    shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
                                                                      cmd_mcastttl, cmd_mcastif, m_lifetime);
 
     if (!check_only) {
@@ -284,7 +285,7 @@ Controller::destroy(int check_only,
     std::string cmd_mcastttl = getNextToken(token, cmd_tokens);
     std::string cmd_mcastif  = getNextToken(token, cmd_tokens);
 
-    ptr_lib::shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
+    shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
                                                                      cmd_mcastttl, cmd_mcastif, m_lifetime);
 
     if (!check_only) {
@@ -310,7 +311,7 @@ Controller::destroyface(int check_only,
     throw Error("command error");
   }
     
-  ptr_lib::shared_ptr<FaceInstance> face = parse_ndn_face_instance_from_face(cmd);
+  shared_ptr<FaceInstance> face = parse_ndn_face_instance_from_face(cmd);
   if (!static_cast<bool>(face)) {
     ret_code = -1;
   }
@@ -338,8 +339,8 @@ Controller::srv()
   }
   std::string port = boost::lexical_cast<std::string>(port_int);
 
-  ptr_lib::shared_ptr<FaceInstance> face = parse_ndn_face_instance(proto, host, port, "", "", -1);
-  ptr_lib::shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry("/", "", m_lifetime);
+  shared_ptr<FaceInstance> face = parse_ndn_face_instance(proto, host, port, "", "", -1);
+  shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry("/", "", m_lifetime);
     
   // crazy operation
   // First. "Create" face, which will do nothing if face already exists
@@ -347,27 +348,27 @@ Controller::srv()
   // Third. Create face for real
 
   face->setAction("newface");
-  startFaceAction(face, ptr_lib::bind(&Controller::srv_step2, this, _1, prefix));
+  startFaceAction(face, bind(&Controller::srv_step2, this, _1, prefix));
 
   return res;
 }
 
 void
-Controller::srv_step2(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix)
+Controller::srv_step2(shared_ptr<FaceInstance> face, shared_ptr<ForwardingEntry> prefix)
 {
   face->setAction("destroyface");
-  startFaceAction(face, ptr_lib::bind(&Controller::srv_step3, this, _1, prefix));
+  startFaceAction(face, bind(&Controller::srv_step3, this, _1, prefix));
 }
 
 void
-Controller::srv_step3(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix)
+Controller::srv_step3(shared_ptr<FaceInstance> face, shared_ptr<ForwardingEntry> prefix)
 {
   face->setAction("newface");
-  startFaceAction(face, ptr_lib::bind(&Controller::srv_step4, this, _1, prefix));
+  startFaceAction(face, bind(&Controller::srv_step4, this, _1, prefix));
 }
 
 void
-Controller::srv_step4(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix)
+Controller::srv_step4(shared_ptr<FaceInstance> face, shared_ptr<ForwardingEntry> prefix)
 {
   prefix->setFaceId(face->getFaceId());
 
@@ -385,14 +386,14 @@ Controller::srv_step4(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_pt
 
 
 
-ptr_lib::shared_ptr<ForwardingEntry>
+shared_ptr<ForwardingEntry>
 Controller::parse_ndn_forwarding_entry(const std::string &cmd_uri,
                                        const std::string &cmd_flags,
                                        int freshness)
 {
   int res = 0;
 
-  ptr_lib::shared_ptr<ForwardingEntry> entry = ptr_lib::make_shared<ForwardingEntry>();
+  shared_ptr<ForwardingEntry> entry = make_shared<ForwardingEntry>();
   
   /* we will be creating the face to either add/delete a prefix on it */
   if (cmd_uri.empty()) {
@@ -434,7 +435,7 @@ Controller::parse_ndn_forwarding_entry(const std::string &cmd_uri,
 
 // creates a full structure without action, if proto == "face" only the
 // faceid (from cmd_host parameter) and lifetime will be filled in.
-ptr_lib::shared_ptr<FaceInstance>
+shared_ptr<FaceInstance>
 Controller::parse_ndn_face_instance(const std::string &cmd_proto,
                                     const std::string &cmd_host,     const std::string &cmd_port,
                                     const std::string &cmd_mcastttl, const std::string &cmd_mcastif,
@@ -469,7 +470,7 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
   int res;
   int socktype;
 
-  ptr_lib::shared_ptr<FaceInstance> entry = ptr_lib::make_shared<FaceInstance>();
+  shared_ptr<FaceInstance> entry = make_shared<FaceInstance>();
   
   if (cmd_proto.empty()) {
     throw Error("command error, missing address type");
@@ -558,10 +559,10 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
   return entry;
 }
 
-ptr_lib::shared_ptr<FaceInstance>
+shared_ptr<FaceInstance>
 Controller::parse_ndn_face_instance_from_face(const std::string &cmd_faceid)
 {
-  ptr_lib::shared_ptr<FaceInstance> entry = ptr_lib::make_shared<FaceInstance>();
+  shared_ptr<FaceInstance> entry = make_shared<FaceInstance>();
     
   /* destroy a face - the URI field will hold the face number */
   if (cmd_faceid.empty()) {
@@ -585,10 +586,10 @@ Controller::parse_ndn_face_instance_from_face(const std::string &cmd_faceid)
 namespace {
 
 void
-onFaceActionSuccess(func_lib::function< void (ptr_lib::shared_ptr<FaceInstance>) > onSuccess,
-                    const ptr_lib::shared_ptr<Data> &data)
+onFaceActionSuccess(function< void (shared_ptr<FaceInstance>) > onSuccess,
+                    Data& data)
 {
-  Block content = data->getContent();
+  Block content = data.getContent();
   content.parse();
 
   if (content.getAll().empty())
@@ -602,7 +603,7 @@ onFaceActionSuccess(func_lib::function< void (ptr_lib::shared_ptr<FaceInstance>)
     {
     case Tlv::FaceManagement::FaceInstance:
       {
-        ptr_lib::shared_ptr<FaceInstance> entry = ptr_lib::make_shared<FaceInstance>();
+        shared_ptr<FaceInstance> entry = make_shared<FaceInstance>();
         entry->wireDecode(*val);
 
         onSuccess(entry);
@@ -625,10 +626,10 @@ onFaceActionSuccess(func_lib::function< void (ptr_lib::shared_ptr<FaceInstance>)
 }
 
 void
-onPrefixActionSuccess(func_lib::function< void (ptr_lib::shared_ptr<ForwardingEntry>) > onSuccess,
-                    const ptr_lib::shared_ptr<Data> &data)
+onPrefixActionSuccess(function< void (shared_ptr<ForwardingEntry>) > onSuccess,
+                      Data& data)
 {
-  Block content = data->getContent();
+  Block content = data.getContent();
   content.parse();
 
   if (content.getAll().empty())
@@ -642,7 +643,7 @@ onPrefixActionSuccess(func_lib::function< void (ptr_lib::shared_ptr<ForwardingEn
     {
     case Tlv::FaceManagement::ForwardingEntry:
       {
-        ptr_lib::shared_ptr<ForwardingEntry> entry = ptr_lib::make_shared<ForwardingEntry>();
+        shared_ptr<ForwardingEntry> entry = make_shared<ForwardingEntry>();
         entry->wireDecode(*val);
 
         onSuccess(entry);
@@ -673,8 +674,8 @@ onActionFailure()
 } // anonymous namespace
 
 void
-Controller::startFaceAction(ptr_lib::shared_ptr<FaceInstance> entry,
-                            func_lib::function< void (ptr_lib::shared_ptr<FaceInstance>) > onSuccess)
+Controller::startFaceAction(shared_ptr<FaceInstance> entry,
+                            function< void (shared_ptr<FaceInstance>) > onSuccess)
 {
   // Set the ForwardingEntry as the content of a Data packet and sign.
   Data data;
@@ -684,7 +685,7 @@ Controller::startFaceAction(ptr_lib::shared_ptr<FaceInstance> entry,
   // Create an empty signature, since nobody going to verify it for now
   // @todo In the future, we may require real signatures to do the registration
   SignatureSha256WithRsa signature;
-  signature.setValue(Block(Tlv::SignatureValue, ptr_lib::make_shared<Buffer>()));
+  signature.setValue(Block(Tlv::SignatureValue, make_shared<Buffer>()));
   data.setSignature(signature);
 
   // Create an interest where the name has the encoded Data packet.
@@ -700,13 +701,13 @@ Controller::startFaceAction(ptr_lib::shared_ptr<FaceInstance> entry,
   interest.setMustBeFresh(true);
 
   m_face.expressInterest(interest,
-                         func_lib::bind(onFaceActionSuccess, onSuccess, _2),
-                         func_lib::bind(onActionFailure));
+                         bind(onFaceActionSuccess, onSuccess, _2),
+                         bind(onActionFailure));
 }
 
 void
-Controller::startPrefixAction(ptr_lib::shared_ptr<ForwardingEntry> entry,
-                              func_lib::function< void (ptr_lib::shared_ptr<ForwardingEntry>) > onSuccess)
+Controller::startPrefixAction(shared_ptr<ForwardingEntry> entry,
+                              function< void (shared_ptr<ForwardingEntry>) > onSuccess)
 {
   // Set the ForwardingEntry as the content of a Data packet and sign.
   Data data;
@@ -716,7 +717,7 @@ Controller::startPrefixAction(ptr_lib::shared_ptr<ForwardingEntry> entry,
   // Create an empty signature, since nobody going to verify it for now
   // @todo In the future, we may require real signatures to do the registration
   SignatureSha256WithRsa signature;
-  signature.setValue(Block(Tlv::SignatureValue, ptr_lib::make_shared<Buffer>()));
+  signature.setValue(Block(Tlv::SignatureValue, make_shared<Buffer>()));
   data.setSignature(signature);
 
   // Create an interest where the name has the encoded Data packet.
@@ -732,9 +733,10 @@ Controller::startPrefixAction(ptr_lib::shared_ptr<ForwardingEntry> entry,
   interest.setMustBeFresh(true);
 
   m_face.expressInterest(interest,
-                         func_lib::bind(onPrefixActionSuccess, onSuccess, _2),
-                         func_lib::bind(onActionFailure));
+                         bind(onPrefixActionSuccess, onSuccess, _2),
+                         bind(onActionFailure));
 }
 
 
+} // namespace ndndc
 } // namespace ndn

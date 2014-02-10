@@ -36,13 +36,14 @@ extern "C" {
 }
 
 #include <ndn-cpp-dev/encoding/tlv.hpp>
-#include <ndn-cpp-dev/face-instance.hpp>
-#include <ndn-cpp-dev/status-response.hpp>
+#include <ndn-cpp-dev/management/ndnd-face-instance.hpp>
+#include <ndn-cpp-dev/management/ndnd-status-response.hpp>
 
 #include "../tlv-hack/tlv-to-ndnb.hpp"
 #include "../tlv-hack/ndnb-to-tlv.hpp"
 
 using namespace ndn;
+using namespace ndn::ndnd;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////

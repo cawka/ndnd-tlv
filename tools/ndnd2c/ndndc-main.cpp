@@ -35,7 +35,7 @@
 namespace {
 
 int
-read_configfile(ndn::Controller &ndndc, const char *filename);
+read_configfile(ndn::ndndc::Controller &ndndc, const char *filename);
 
 void
 usage(const char *progname)
@@ -96,7 +96,7 @@ public:
     if (optind < argc) {
       /* config file cannot be combined with command line */
       if (configfile != NULL) {
-        throw ndn::Controller::Error("Config file cannot be combined with command line");
+        throw ndn::ndndc::Controller::Error("Config file cannot be combined with command line");
         usage(progname);
         exit(res);
       }
@@ -127,13 +127,13 @@ public:
   int argc;
   char **argv;
 
-  ndn::ptr_lib::shared_ptr<ndn::Controller> controller;
+  ndn::ptr_lib::shared_ptr<ndn::ndndc::Controller> controller;
 };
 
 void
 OnError()
 {
-  throw ndn::Controller::Error("Error communicating with local NDN forwarder");
+  throw ndn::ndndc::Controller::Error("Error communicating with local NDN forwarder");
 }
 
 int
@@ -169,9 +169,9 @@ main(int argc, char **argv)
     return 1;
   }
 
-  p.controller = ndn::ptr_lib::make_shared<ndn::Controller>(ndn::func_lib::bind(&Processor::Process, &p),
-                                                            OnError,
-                                                            p.lifetime);
+  p.controller = ndn::ptr_lib::make_shared<ndn::ndndc::Controller>(ndn::func_lib::bind(&Processor::Process, &p),
+                                                                   OnError,
+                                                                   p.lifetime);
 
   try {
     p.controller->getFace().processEvents();
@@ -195,7 +195,7 @@ namespace {
  * to check for errors.  If no erors found, commands are executing if normal mode.
  */
 int
-read_configfile(ndn::Controller &ndndc, const char *filename)
+read_configfile(ndn::ndndc::Controller &ndndc, const char *filename)
 {
   int configerrors;
   int lineno;
@@ -215,7 +215,7 @@ read_configfile(ndn::Controller &ndndc, const char *filename)
     lineno = 0;
     cfg = fopen(filename, "r");
     if (cfg == NULL) {
-      throw ndn::Controller::Error(std::string(strerror(errno)) + "(" + filename + ")");
+      throw ndn::ndndc::Controller::Error(std::string(strerror(errno)) + "(" + filename + ")");
     }
         
     while (fgets((char *)buf, sizeof(buf), cfg)) {

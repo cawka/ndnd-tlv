@@ -21,7 +21,7 @@ extern "C" {
 #include "tlv-hack.h"
 
 #include <ndn-cpp-dev/encoding/tlv.hpp>
-#include <ndn-cpp-dev/status-response.hpp>
+#include <ndn-cpp-dev/management/ndnd-status-response.hpp>
 #include <ndn-cpp-dev/data.hpp>
 
 #include "tlv-to-ndnb.hpp"
@@ -30,6 +30,7 @@ extern "C" {
 #include <fstream>
 
 using namespace ndn;
+using namespace ndn::ndnd;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////

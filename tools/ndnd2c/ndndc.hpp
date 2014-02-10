@@ -26,11 +26,17 @@
 
 #include <ndn-cpp-dev/face.hpp>
 
-#include <ndn-cpp-dev/forwarding-entry.hpp>
-#include <ndn-cpp-dev/status-response.hpp>
-#include <ndn-cpp-dev/face-instance.hpp>
+#include <ndn-cpp-dev/management/ndnd-forwarding-entry.hpp>
+#include <ndn-cpp-dev/management/ndnd-status-response.hpp>
+#include <ndn-cpp-dev/management/ndnd-face-instance.hpp>
 
 namespace ndn {
+namespace ndndc {
+
+using ndn::ndnd::FaceInstance;
+using ndn::ndnd::ForwardingEntry;
+using ndn::ndnd::ForwardingFlags;
+using ndn::ndnd::StatusResponse;
 
 /**
  * @brief Class implementing functions to create/destroy faces/prefixes of the local forwarding daemon
@@ -40,8 +46,8 @@ class Controller // aka Ndnc
 public:
   struct Error : public std::runtime_error { Error(const std::string &what) : std::runtime_error(what) {} };
 
-  typedef func_lib::function<void(void)> OnReady;
-  typedef func_lib::function<void(void)> OnFailure;
+  typedef function<void(void)> OnReady;
+  typedef function<void(void)> OnFailure;
   
   Controller(OnReady onReady, OnFailure onFailure, int lifetime = -1);
   ~Controller();
@@ -163,44 +169,44 @@ public:
   
 private:
   void
-  startFaceAction(ptr_lib::shared_ptr<FaceInstance> entry,
-                  func_lib::function< void (ptr_lib::shared_ptr<FaceInstance>) > onSuccess);
+  startFaceAction(shared_ptr<FaceInstance> entry,
+                  function< void (shared_ptr<FaceInstance>) > onSuccess);
 
   void
-  startPrefixAction(ptr_lib::shared_ptr<ForwardingEntry> entry,
-                    func_lib::function< void (ptr_lib::shared_ptr<ForwardingEntry>) > onSuccess);
+  startPrefixAction(shared_ptr<ForwardingEntry> entry,
+                    function< void (shared_ptr<ForwardingEntry>) > onSuccess);
   
 
   //
   void
-  add_or_del_step2(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix);
+  add_or_del_step2(shared_ptr<FaceInstance> face, shared_ptr<ForwardingEntry> prefix);
 
   //
   void
-  srv_step2(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix);
+  srv_step2(shared_ptr<FaceInstance> face, shared_ptr<ForwardingEntry> prefix);
   
   void
-  srv_step3(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix);
+  srv_step3(shared_ptr<FaceInstance> face, shared_ptr<ForwardingEntry> prefix);
   
   void
-  srv_step4(ptr_lib::shared_ptr<FaceInstance> face, ptr_lib::shared_ptr<ForwardingEntry> prefix);
+  srv_step4(shared_ptr<FaceInstance> face, shared_ptr<ForwardingEntry> prefix);
   
   // int
   // do_prefix_action(const std::string &action,
   //                  struct ndn_forwarding_entry *forwarding_entry);
 
-  ptr_lib::shared_ptr<ForwardingEntry>
+  shared_ptr<ForwardingEntry>
   parse_ndn_forwarding_entry(const std::string &cmd_uri,
                              const std::string &cmd_flags,
                              int freshness);
   
-  ptr_lib::shared_ptr<FaceInstance>
+  shared_ptr<FaceInstance>
   parse_ndn_face_instance(const std::string &cmd_proto,
                           const std::string &cmd_host,     const std::string &cmd_port,
                           const std::string &cmd_mcastttl, const std::string &cmd_mcastif,
                           int freshness);
 
-  ptr_lib::shared_ptr<FaceInstance>
+  shared_ptr<FaceInstance>
   parse_ndn_face_instance_from_face(const std::string &cmd_faceid);
   
 private:
@@ -211,6 +217,7 @@ private:
   // struct ndn_charbuf  *no_name;   // an empty name
 };
 
+} // namespace ndndc
 } // namespace ndn
 
 #endif
