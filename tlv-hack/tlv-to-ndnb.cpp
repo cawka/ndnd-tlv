@@ -25,7 +25,7 @@ extern "C" {
 namespace ndn {
 
 void
-interest_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
+interest_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
 {
   block.parse();
   
@@ -35,8 +35,8 @@ interest_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
   name_tlv_to_ndnb(block.get(Tlv::Name), ndnb);
 
   // Selectors
-  Block::element_iterator val = block.find(Tlv::Selectors);
-  if (val != block.getAll().end())
+  Block::element_const_iterator val = block.find(Tlv::Selectors);
+  if (val != block.elements().end())
     {
       selectors_tlv_to_ndnb(*val, ndnb);
     }
@@ -51,7 +51,7 @@ interest_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
 
   // Scope
   val = block.find(Tlv::Scope);
-  if (val != block.getAll().end())
+  if (val != block.elements().end())
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t scope = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end());
@@ -60,7 +60,7 @@ interest_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
   
   // InterestLifetime
   val = block.find(Tlv::InterestLifetime);
-  if (val != block.getAll().end())
+  if (val != block.elements().end())
     {
       Buffer::const_iterator begin = val->value_begin();
       double tlvLifetime = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end()) / 1000.0;
@@ -78,7 +78,7 @@ interest_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
   
   // Nonce
   val = block.find(Tlv::Nonce);
-  if (val != block.getAll().end())
+  if (val != block.elements().end())
     {
       ndnb_append_tagged_blob(ndnb, NDN_DTAG_Nonce, val->value(), val->value_size());
     }
@@ -87,7 +87,7 @@ interest_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
 }
 
 void
-data_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
+data_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
 {
   block.parse();
   
@@ -121,13 +121,13 @@ name_to_ndnb(const Name &name, ndn_charbuf *ndnb)
 }
 
 inline void
-name_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
+name_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
 {
   block.parse();
   
   ndn_charbuf_append_tt(ndnb, NDN_DTAG_Name, NDN_DTAG);
-  for (Block::element_const_iterator component = block.getAll().begin ();
-       component != block.getAll().end ();
+  for (Block::element_const_iterator component = block.elements().begin ();
+       component != block.elements().end ();
        component++)
     {
       ndnb_append_tagged_blob(ndnb, NDN_DTAG_Component, component->value(), component->value_size());
@@ -136,13 +136,13 @@ name_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
 }
 
 inline void
-selectors_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
+selectors_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
 {
   block.parse();
   
   // MinSuffixComponents
-  Block::element_iterator val = block.find(Tlv::MinSuffixComponents);
-  if (val != block.getAll().end())
+  Block::element_const_iterator val = block.find(Tlv::MinSuffixComponents);
+  if (val != block.elements().end())
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t value = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end());
@@ -151,7 +151,7 @@ selectors_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
 
   // MaxSuffixComponents
   val = block.find(Tlv::MaxSuffixComponents);
-  if (val != block.getAll().end())
+  if (val != block.elements().end())
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t value = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end());
@@ -160,14 +160,14 @@ selectors_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
 
   // Exclude
   val = block.find(Tlv::Exclude);
-  if (val != block.getAll().end())
+  if (val != block.elements().end())
     {
       exclude_tlv_to_ndnb(*val, ndnb);
     }
 
   // ChildSelector
   val = block.find(Tlv::ChildSelector);
-  if (val != block.getAll().end())
+  if (val != block.elements().end())
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t value = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end());
@@ -176,7 +176,7 @@ selectors_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
 
   //MustBeFresh aka AnswerOriginKind
   val = block.find(Tlv::MustBeFresh);
-  if (val != block.getAll().end())
+  if (val != block.elements().end())
     {
       // ndn_charbuf_append_tt(ndnb, NDN_DTAG_AnswerOriginKind, NDN_DTAG);
       // ndnb_append_number(ndnb, NDN_AOK_DEFAULT);
@@ -193,13 +193,13 @@ selectors_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
 }
 
 void
-exclude_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
+exclude_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
 {
   block.parse();
 
   ndn_charbuf_append_tt(ndnb, NDN_DTAG_Exclude, NDN_DTAG);
-  for (Block::element_const_iterator component = block.getAll().begin ();
-       component != block.getAll().end ();
+  for (Block::element_const_iterator component = block.elements().begin ();
+       component != block.elements().end ();
        component++)
     {
       if (component->type() == Tlv::Any)
@@ -216,7 +216,7 @@ exclude_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb)
 }
 
 inline void
-signature_info_and_value_tlv_to_ndnb(Block &info, Block &value, ndn_charbuf *ndnb)
+signature_info_and_value_tlv_to_ndnb(const Block &info, const Block &value, ndn_charbuf *ndnb)
 {
   info.parse();
 
@@ -240,7 +240,7 @@ signature_info_and_value_tlv_to_ndnb(Block &info, Block &value, ndn_charbuf *ndn
 }
 
 inline void
-meta_and_signature_info_tlv_to_ndnb(Block &metaInfo, Block &signatureInfo, ndn_charbuf *ndnb)
+meta_and_signature_info_tlv_to_ndnb(const Block &metaInfo, const Block &signatureInfo, ndn_charbuf *ndnb)
 {
   metaInfo.parse();
   signatureInfo.parse();
@@ -264,8 +264,8 @@ meta_and_signature_info_tlv_to_ndnb(Block &metaInfo, Block &signatureInfo, ndn_c
   ndn_charbuf_append_closer(ndnb);
   
   // ContentType (aka Type)
-  Block::element_iterator val = metaInfo.find(Tlv::ContentType);
-  if (val != metaInfo.getAll().end())
+  Block::element_const_iterator val = metaInfo.find(Tlv::ContentType);
+  if (val != metaInfo.elements().end())
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t value = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end());
@@ -295,7 +295,7 @@ meta_and_signature_info_tlv_to_ndnb(Block &metaInfo, Block &signatureInfo, ndn_c
 
   // FreshnessPeriod (aka FreshnessSeconds)
   val = metaInfo.find(Tlv::FreshnessPeriod);
-  if (val != metaInfo.getAll().end())
+  if (val != metaInfo.elements().end())
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t value = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end()) / 1000;

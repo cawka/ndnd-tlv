@@ -20,10 +20,10 @@ struct ndn_charbuf;
 namespace ndn {
 
 void
-interest_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);
+interest_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb);
 
 void
-data_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);
+data_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb);
 
 void
 name_to_ndnb(const Name &name, ndn_charbuf *ndnb);
@@ -31,19 +31,19 @@ name_to_ndnb(const Name &name, ndn_charbuf *ndnb);
 // Internal use only
 
 inline void
-name_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);
+name_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb);
 
 inline void
-selectors_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);
+selectors_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb);
 
 inline void
-exclude_tlv_to_ndnb(Block &block, ndn_charbuf *ndnb);
+exclude_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb);
 
 inline void
-signature_info_and_value_tlv_to_ndnb(Block &info, Block &value, ndn_charbuf *ndnb);
+signature_info_and_value_tlv_to_ndnb(const Block &info, const Block &value, ndn_charbuf *ndnb);
 
 inline void
-meta_and_signature_info_tlv_to_ndnb(Block &meta, Block &signature, ndn_charbuf *ndnb);
+meta_and_signature_info_tlv_to_ndnb(const Block &meta, const Block &signature, ndn_charbuf *ndnb);
 
 }
 

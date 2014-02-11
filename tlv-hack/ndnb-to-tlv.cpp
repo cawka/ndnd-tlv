@@ -33,7 +33,7 @@ interest_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi, co
 
   // Selectors
   Block selectors = selectors_ndnb_to_tlv(buf, pi);
-  if (!selectors.getAll().empty())
+  if (!selectors.elements().empty())
     {
       interest.push_back(selectors);
     }

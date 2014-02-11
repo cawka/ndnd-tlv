@@ -592,12 +592,12 @@ onFaceActionSuccess(function< void (shared_ptr<FaceInstance>) > onSuccess,
   Block content = data.getContent();
   content.parse();
 
-  if (content.getAll().empty())
+  if (content.elements().empty())
     {
       throw Controller::Error("Error while communicating to the local NDN forwarder");
     }
 
-  Block::element_iterator val = content.getAll().begin();
+  Block::element_const_iterator val = content.elements().begin();
   
   switch(val->type())
     {
@@ -632,12 +632,12 @@ onPrefixActionSuccess(function< void (shared_ptr<ForwardingEntry>) > onSuccess,
   Block content = data.getContent();
   content.parse();
 
-  if (content.getAll().empty())
+  if (content.elements().empty())
     {
       throw Controller::Error("Error while communicating to the local NDN forwarder");
     }
 
-  Block::element_iterator val = content.getAll().begin();
+  Block::element_const_iterator val = content.elements().begin();
   
   switch(val->type())
     {
