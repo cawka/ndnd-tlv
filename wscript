@@ -60,13 +60,14 @@ def configure(conf):
                        mandatory=True)
         
     conf.check_cxx(lib='resolv',  uselib_store='RESOLV',  mandatory=True)
+    conf.check_cxx(lib='dl', uselib_store='DL', mandatory=False)
     conf.check_boost(lib="system iostreams")
 
 def build (bld):
     bld (target = 'ndn-tlv',
          features=['c', 'cxx', 'cxxstlib', 'cstlib'],
          source = bld.path.ant_glob(['lib/**/*.c', 'lib/**/*.cpp', 'tlv-hack/**/*.cpp']),
-         use = 'SSL BOOST NDN_CPP',
+         use = 'SSL BOOST NDN_CPP DL',
          includes = "include",
          )
 
@@ -82,7 +83,7 @@ def build (bld):
             bld(features=['c', 'cxx', 'cxxprogram'],
                 target = 'bin/%s' % (str(app)),
                 source = app.ant_glob(['**/*.c', '**/*.cpp']),
-                use = 'ndn-tlv BOOST SSL NDN_CPP RESOLV',
+                use = 'ndn-tlv BOOST SSL NDN_CPP RESOLV DL',
                 includes = "include",
                 )
 
