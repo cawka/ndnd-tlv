@@ -5056,7 +5056,7 @@ process_input(struct ndnd_handle *h, int fd)
     struct sockaddr *addr = (struct sockaddr *)&sstor;
     int err = 0;
     socklen_t err_sz;
-    
+
     face = hashtb_lookup(h->faces_by_fd, &fd, sizeof(fd));
     if (face == NULL)
         return;
@@ -5111,8 +5111,8 @@ process_input(struct ndnd_handle *h, int fd)
         // 0x01 0xD2  NDNb Interest
         // 0x04 0x82  NDNb Data
         
-        if ((face->inbuf->buf[0] == 0x01 && face->inbuf->buf[1] != 0xD2) || // TLV's Interest
-            face->inbuf->buf[0] == 0x02)   // TLV's Data
+        if (face->inbuf->buf[0] == 0x03 || // TLV's Interest
+            face->inbuf->buf[0] == 0x04)   // TLV's Data
           {
             face->flags |= NDN_FACE_TLV;
             
@@ -5148,6 +5148,8 @@ process_input(struct ndnd_handle *h, int fd)
           }
         else
           {
+            face->flags |= ~NDN_FACE_TLV;
+
             dres = ndn_skeleton_decode(d, buf, res);
             while (d->state == 0) {
               process_input_message(h, source,
