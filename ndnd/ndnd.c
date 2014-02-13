@@ -5111,8 +5111,8 @@ process_input(struct ndnd_handle *h, int fd)
         // 0x01 0xD2  NDNb Interest
         // 0x04 0x82  NDNb Data
         
-        if (face->inbuf->buf[0] == 0x03 || // TLV's Interest
-            face->inbuf->buf[0] == 0x04)   // TLV's Data
+        if (face->inbuf->buf[0] == 0x05 || // TLV's Interest
+            face->inbuf->buf[0] == 0x06)   // TLV's Data
           {
             face->flags |= NDN_FACE_TLV;
             
@@ -5148,7 +5148,7 @@ process_input(struct ndnd_handle *h, int fd)
           }
         else
           {
-            face->flags |= ~NDN_FACE_TLV;
+            face->flags &= ~NDN_FACE_TLV;
 
             dres = ndn_skeleton_decode(d, buf, res);
             while (d->state == 0) {
