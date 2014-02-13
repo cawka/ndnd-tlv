@@ -120,14 +120,20 @@ namespace {
 inline std::string
 getNextToken(tokenizer<escaped_list_separator<char> >::iterator &token, tokenizer<escaped_list_separator<char> > cmd_tokens)
 {
-  if (token != cmd_tokens.end())
+  while (token != cmd_tokens.end())
     {
+      if (token->empty())
+        {
+          ++token;
+          continue;
+        }
+
       std::string retval = *token;
-      token ++;
+      ++token;
       return retval;
     }
-  else
-    return "";
+
+  return "";
 }
 
 void

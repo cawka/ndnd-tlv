@@ -35,7 +35,7 @@
 namespace {
 
 int
-read_configfile(ndn::ndndc::Controller &ndndc, const char *filename);
+read_configfile(ndn::ndndc::Controller &ndndc, const std::string& filename);
 
 void
 usage(const char *progname)
@@ -195,7 +195,7 @@ namespace {
  * to check for errors.  If no erors found, commands are executing if normal mode.
  */
 int
-read_configfile(ndn::ndndc::Controller &ndndc, const char *filename)
+read_configfile(ndn::ndndc::Controller &ndndc, const std::string& filename)
 {
   int configerrors;
   int lineno;
@@ -213,7 +213,13 @@ read_configfile(ndn::ndndc::Controller &ndndc, const char *filename)
     configerrors = 0;
     retcode = 0;
     lineno = 0;
-    cfg = fopen(filename, "r");
+    if (filename != "-")
+      cfg = fopen(filename.c_str(), "r");
+    else {
+      cfg = stdin;
+      phase = 0; // cannot read stdin twice...
+    }
+    
     if (cfg == NULL) {
       throw ndn::ndndc::Controller::Error(std::string(strerror(errno)) + "(" + filename + ")");
     }
@@ -226,24 +232,35 @@ read_configfile(ndn::ndndc::Controller &ndndc, const char *filename)
       if (buf[len - 1] == '\n')
         buf[len - 1] = '\0';
       cp = index(buf, '#');
-      if (cp != NULL)
+      if (cp != 0)
         *cp = '\0';
-            
+      if (strlen(buf) == 0)
+        continue;
+
       rest_of_the_command = buf;
       do {
         cmd = strsep(&rest_of_the_command, " \t");
-      } while (cmd != NULL && cmd[0] == 0);
-            
-      if (cmd == NULL) /* blank line */
+      } while (cmd != 0 && cmd[0] == 0);
+
+      if (cmd == 0) /* blank line */
         continue;
+
+      if ((phase == 1 || cfg == stdin) && rest_of_the_command == 0)
+        {
+          std::cerr << "WARN: " << "Error: near line " << lineno << std::endl;
+          configerrors++;
+          continue;
+        }
+
       res = ndndc.dispatch(phase, cmd, rest_of_the_command, -1);
       retcode += res;
-      if (phase == 1 && res < 0) {
+      if ((phase == 1 || cfg == stdin) && res < 0) {
         std::cerr << "WARN: " << "Error: near line " << lineno << std::endl;
         configerrors++;
       }
     }
-    fclose(cfg);
+    if (filename != "-")
+      fclose(cfg);
     if (configerrors != 0)
       return (-configerrors);
   } 
