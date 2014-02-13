@@ -303,6 +303,18 @@ meta_and_signature_info_tlv_to_ndnb(const Block &metaInfo, const Block &signatur
     }
 
   // FinalBlockID is optional and is not part of NDN-TLV
+  val = metaInfo.find(Tlv::FinalBlockId);
+  if (val != metaInfo.elements().end())
+    {
+      val->parse();
+      Block::element_const_iterator finalBlockId = val->find(Tlv::NameComponent);
+      if (finalBlockId != val->elements().end())
+        {
+          ndnb_append_tagged_blob(ndnb, NDN_DTAG_FinalBlockID,
+                                  finalBlockId->value(), finalBlockId->value_size());
+        }
+      // otherwise simply ignore, though it is an error
+    }
   
   // KeyLocator
   {

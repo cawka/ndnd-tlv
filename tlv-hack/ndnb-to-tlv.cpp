@@ -20,6 +20,8 @@ extern "C" {
 }
 
 #include "ndnb-to-tlv.hpp"
+#include <ndn-cpp-dev/name-component.hpp>
+#include <ndn-cpp-dev/meta-info.hpp>
 
 namespace ndn {
 
@@ -244,14 +246,14 @@ exclude_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi)
 inline Block
 meta_info_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObject &co)
 {
-  Block meta(Tlv::MetaInfo);
+  MetaInfo meta;
 
   // ContentType
   if (co.type == NDN_CONTENT_LINK) {
-    meta.push_back(nonNegativeIntegerBlock(Tlv::ContentType, Tlv::ContentType_Link));
+    meta.setType(Tlv::ContentType_Link);
   }
   else if (co.type == NDN_CONTENT_KEY) {
-    meta.push_back(nonNegativeIntegerBlock(Tlv::ContentType, Tlv::ContentType_Key));
+    meta.setType(Tlv::ContentType_Key);
   }
   else {
     // do nothing
@@ -264,11 +266,24 @@ meta_info_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObject &
                                                            co.offset[NDN_PCO_B_FreshnessSeconds], co.offset[NDN_PCO_E_FreshnessSeconds]);
     seconds *= 1000;
 
-    meta.push_back(nonNegativeIntegerBlock(Tlv::FreshnessPeriod, seconds));
+    meta.setFreshnessPeriod(seconds);
   }
+
   
-  meta.encode();
-  return meta;
+  // FinalBlockId
+  if (co.offset[NDN_PCO_B_FinalBlockID] != co.offset[NDN_PCO_E_FinalBlockID]) {
+    const unsigned char *finalid = NULL;
+    size_t finalid_size = 0;
+    ndn_ref_tagged_BLOB(NDN_DTAG_FinalBlockID, buf,
+                        co.offset[NDN_PCO_B_FinalBlockID],
+                        co.offset[NDN_PCO_E_FinalBlockID],
+                        &finalid,
+                        &finalid_size);
+
+    meta.setFinalBlockId(name::Component(finalid, finalid_size));
+  }
+
+  return meta.wireEncode();
 }
 
 inline Block
