@@ -55,7 +55,7 @@ interest_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t scope = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end());
-      ndnb_tagged_putf(ndnb, NDN_DTAG_Scope, "%d", scope);
+      ndnb_tagged_putf(ndnb, NDN_DTAG_Scope, "%d", (int)scope);
     }
   
   // InterestLifetime
@@ -146,7 +146,7 @@ selectors_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t value = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end());
-      ndnb_tagged_putf(ndnb, NDN_DTAG_MinSuffixComponents, "%d", value);
+      ndnb_tagged_putf(ndnb, NDN_DTAG_MinSuffixComponents, "%d", (int)value);
     }
 
   // MaxSuffixComponents
@@ -155,7 +155,7 @@ selectors_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t value = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end());
-      ndnb_tagged_putf(ndnb, NDN_DTAG_MaxSuffixComponents, "%d", value);
+      ndnb_tagged_putf(ndnb, NDN_DTAG_MaxSuffixComponents, "%d", (int)value);
     }
 
   // Exclude
@@ -171,7 +171,7 @@ selectors_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t value = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end());
-      ndnb_tagged_putf(ndnb, NDN_DTAG_ChildSelector, "%d", value);
+      ndnb_tagged_putf(ndnb, NDN_DTAG_ChildSelector, "%d", (int)value);
     }
 
   //MustBeFresh aka AnswerOriginKind
@@ -299,7 +299,7 @@ meta_and_signature_info_tlv_to_ndnb(const Block &metaInfo, const Block &signatur
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t value = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end()) / 1000;
-      ndnb_tagged_putf(ndnb, NDN_DTAG_FreshnessSeconds, "%d", value);    
+      ndnb_tagged_putf(ndnb, NDN_DTAG_FreshnessSeconds, "%d", (int)value);    
     }
 
   // FinalBlockID is optional and is not part of NDN-TLV
