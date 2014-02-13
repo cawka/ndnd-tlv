@@ -11,16 +11,19 @@ def options(opt):
 
     opt = opt.add_option_group('NDN TLV Daemon Options')
     opt.add_option('--debug',action='store_true',default=False,dest='debug',help='''debugging mode''')
-    opt.add_option('--with-ndn-cpp',action='store',type='string',default=None,dest='ndn_cpp_dir',
-                   help='''Use NDN-CPP library from the specified path''')
     opt.add_option('--with-c++11', action='store_true', default=False, dest='use_cxx11',
                    help='''Enable C++11 compiler features''')
-
+    opt.add_option('--with-tests', action='store_true',default=False,dest='with_tests',
+                   help='''build unit tests''')
+    
 def configure(conf):
     conf.load("compiler_c compiler_cxx gnu_dirs ndnx boost")
 
     conf.find_program('sh')
 
+    if conf.options.with_tests:
+        conf.env['WITH_TESTS'] = True
+    
     if conf.options.debug:
         conf.define ('_DEBUG', 1)
         flags = ['-O0',
@@ -51,31 +54,30 @@ def configure(conf):
     conf.check_ndnx()
     conf.check_openssl()
 
-    if not conf.options.ndn_cpp_dir:
-        conf.check_cfg(package='libndn-cpp-dev', args=['--cflags', '--libs'], uselib_store='NDN_CPP', mandatory=True)
-    else:
-        conf.check_cxx(lib='ndn-cpp', uselib_store='NDN_CPP', 
-                       cxxflags="-I%s/include" % conf.options.ndn_cpp_dir,
-                       linkflags="-L%s/lib" % conf.options.ndn_cpp_dir,
-                       mandatory=True)
+    conf.check_cfg(package='libndn-cpp-dev', args=['--cflags', '--libs'], uselib_store='NDN_CPP', mandatory=True)
         
     conf.check_cxx(lib='resolv',  uselib_store='RESOLV',  mandatory=True)
     conf.check_cxx(lib='dl', uselib_store='DL', mandatory=False)
-    conf.check_boost(lib="system iostreams")
+
+    USED_BOOST_LIBS = 'system iostreams'
+    if conf.env['WITH_TESTS']:
+        USED_BOOST_LIBS += " unit_test_framework"
+    conf.check_boost(lib=USED_BOOST_LIBS)
 
 def build (bld):
     bld (target = 'ndn-tlv',
+         name = 'ndn-tlv',
          features=['c', 'cxx', 'cxxstlib', 'cstlib'],
          source = bld.path.ant_glob(['lib/**/*.c', 'lib/**/*.cpp', 'tlv-hack/**/*.cpp']),
          use = 'SSL BOOST NDN_CPP DL',
          includes = "include",
+         export_includes = "include",
          )
 
     bld (target="bin/ndnd-tlv",
          features=['c', 'cxx', 'cxxprogram'],
          source = bld.path.ant_glob(['ndnd/**/*.c', 'ndnd/**/*.cpp']),
-         use = 'ndn-tlv SSL BOOST NDN_CPP',
-         includes = "include",
+         use = 'ndn-tlv',
         )
 
     for app in bld.path.ant_glob('tools/*', dir=True):
@@ -83,15 +85,14 @@ def build (bld):
             bld(features=['c', 'cxx', 'cxxprogram'],
                 target = 'bin/%s' % (str(app)),
                 source = app.ant_glob(['**/*.c', '**/*.cpp']),
-                use = 'ndn-tlv BOOST SSL NDN_CPP RESOLV DL',
-                includes = "include",
+                use = 'ndn-tlv RESOLV',
                 )
 
     for app in bld.path.ant_glob('tools/*.c'):
         bld(features=['c', 'cxxprogram'],
             target = 'bin/%s' % (str(app.change_ext('','.c'))),
             source = app,
-            use = 'ndn-tlv BOOST SSL NDN_CPP',
+            use = 'ndn-tlv',
             includes = "include",
             )
 
@@ -107,6 +108,10 @@ def build (bld):
     
     bld.install_files('%s/ndn-tlv' % bld.env['INCLUDEDIR'], bld.path.ant_glob(['tlv-hack/**/*.h', 'tlv-hack/**/*.hpp']), 
                       relative_trick=True, cwd=bld.path.find_node('tlv-hack'))
+    
+    # Unit tests
+    if bld.env['WITH_TESTS']:
+        bld.recurse('tests')
 
 @Configure.conf
 def add_supported_cxxflags(self, cxxflags):

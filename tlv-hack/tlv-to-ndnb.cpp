@@ -259,9 +259,8 @@ meta_and_signature_info_tlv_to_ndnb(const Block &metaInfo, const Block &signatur
   ndnb_append_tagged_blob(ndnb, NDN_DTAG_PublisherPublicKeyDigest, fakePublisherPublicKeyDigest, 32);
 
   // Timestamp
-  ndn_charbuf_append_tt(ndnb, NDN_DTAG_Timestamp, NDN_DTAG);
-  ndnb_append_now_blob(ndnb, NDN_MARKER_NONE);
-  ndn_charbuf_append_closer(ndnb);
+  const char fixedTimestamp[] = {149, 206, 184, 0, 0};
+  ndnb_append_tagged_blob(ndnb, NDN_DTAG_Timestamp, fixedTimestamp, sizeof(fixedTimestamp));
   
   // ContentType (aka Type)
   Block::element_const_iterator val = metaInfo.find(Tlv::ContentType);
