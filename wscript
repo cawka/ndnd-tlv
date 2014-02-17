@@ -7,7 +7,7 @@ import os
 
 def options(opt):
     opt.load('compiler_c compiler_cxx gnu_dirs')
-    opt.load('ndnx boost', tooldir=['waf-tools'])
+    opt.load('ndnx boost coverage', tooldir=['.waf-tools'])
 
     opt = opt.add_option_group('NDN TLV Daemon Options')
     opt.add_option('--debug',action='store_true',default=False,dest='debug',help='''debugging mode''')
@@ -64,6 +64,8 @@ def configure(conf):
         USED_BOOST_LIBS += " unit_test_framework"
     conf.check_boost(lib=USED_BOOST_LIBS)
 
+    conf.load("coverage")
+    
 def build (bld):
     bld (target = 'ndn-tlv',
          name = 'ndn-tlv',

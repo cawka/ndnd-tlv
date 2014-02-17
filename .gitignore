@@ -5,7 +5,7 @@
 .DS_Store
 
 # waf build system
-.waf*
+.waf-1*
 .lock*
 build/
-waf-tools/*.pyc
+.waf-tools/*.pyc
