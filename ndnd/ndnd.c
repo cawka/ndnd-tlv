@@ -5114,7 +5114,7 @@ process_input(struct ndnd_handle *h, int fd)
         if (face->inbuf->buf[0] == 0x05 || // TLV's Interest
             face->inbuf->buf[0] == 0x06)   // TLV's Data
           {
-            face->flags |= NDN_FACE_TLV;
+            source->flags |= NDN_FACE_TLV;
             
             // TLV-hack begin
             struct ndn_charbuf *msg;
@@ -5148,7 +5148,7 @@ process_input(struct ndnd_handle *h, int fd)
           }
         else
           {
-            face->flags &= ~NDN_FACE_TLV;
+            source->flags &= ~NDN_FACE_TLV;
 
             dres = ndn_skeleton_decode(d, buf, res);
             while (d->state == 0) {
