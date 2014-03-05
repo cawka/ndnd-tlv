@@ -26,6 +26,9 @@ void
 data_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb);
 
 void
+sequence_number_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb);
+
+void
 name_to_ndnb(const Name &name, ndn_charbuf *ndnb);
 
 // Internal use only

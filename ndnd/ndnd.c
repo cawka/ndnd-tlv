@@ -5148,7 +5148,8 @@ process_input(struct ndnd_handle *h, int fd)
           }
         else
           {
-            source->flags &= ~NDN_FACE_TLV;
+            // Do not switch face back NDNb
+            // source->flags &= ~NDN_FACE_TLV;
 
             dres = ndn_skeleton_decode(d, buf, res);
             while (d->state == 0) {
@@ -5339,6 +5340,9 @@ ndnd_send(struct ndnd_handle *h,
       if (tlvsize >= 0) {
         data = tlvbuf;
         size = tlvsize;
+      }
+      else {
+        ndnd_msg(h, "Face is TLV, but packet failed to get converted");
       }
     }
     

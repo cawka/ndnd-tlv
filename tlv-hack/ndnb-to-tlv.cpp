@@ -57,6 +57,10 @@ interest_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi, co
     interest.push_back
       (dataBlock(Tlv::Nonce, nonce, noncesize));
   }
+  else {
+    interest.push_back
+      (nonNegativeIntegerBlock(Tlv::Nonce, 0));
+  }
 
   // Scope
   if (pi.offset[NDN_PI_B_Scope] < pi.offset[NDN_PI_E_Scope]) {

@@ -20,6 +20,7 @@ extern "C" {
 }
 
 #include "tlv-to-ndnb.hpp"
+#include "sequence-number.hpp"
 #include <ndn-cpp-dev/security/signature-sha256-with-rsa.hpp>
 
 namespace ndn {
@@ -28,7 +29,7 @@ void
 interest_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
 {
   block.parse();
-  
+
   ndn_charbuf_append_tt(ndnb, NDN_DTAG_Interest, NDN_DTAG);
 
   // Name
@@ -43,7 +44,7 @@ interest_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
   else
     {
       // due to change of the semantics, when TLV selectors are not present, enable NDNb selector to allow stale data
-      
+
       ndn_charbuf_append_tt(ndnb, NDN_DTAG_AnswerOriginKind, NDN_DTAG);
       ndnb_append_number(ndnb, NDN_AOK_DEFAULT | NDN_AOK_STALE);
       ndn_charbuf_append_closer(ndnb); /* </AnswerOriginKind> */
@@ -57,7 +58,7 @@ interest_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
       uint64_t scope = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end());
       ndnb_tagged_putf(ndnb, NDN_DTAG_Scope, "%d", (int)scope);
     }
-  
+
   // InterestLifetime
   val = block.find(Tlv::InterestLifetime);
   if (val != block.elements().end())
@@ -75,14 +76,14 @@ interest_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
         }
       ndnb_append_tagged_blob(ndnb, NDN_DTAG_InterestLifetime, buf, sizeof(buf));
     }
-  
+
   // Nonce
   val = block.find(Tlv::Nonce);
   if (val != block.elements().end())
     {
       ndnb_append_tagged_blob(ndnb, NDN_DTAG_Nonce, val->value(), val->value_size());
     }
-  
+
   ndn_charbuf_append_closer(ndnb); /* </Interest> */
 }
 
@@ -90,7 +91,7 @@ void
 data_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
 {
   block.parse();
-  
+
   ndn_charbuf_append_tt(ndnb, NDN_DTAG_ContentObject, NDN_DTAG);
 
   // Signature
@@ -101,8 +102,19 @@ data_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
   meta_and_signature_info_tlv_to_ndnb(block.get(Tlv::MetaInfo), block.get(Tlv::SignatureInfo), ndnb);
   // Content
   ndnb_append_tagged_blob(ndnb, NDN_DTAG_Content, block.get(Tlv::Content).value(), block.get(Tlv::Content).value_size());
-  
+
   ndn_charbuf_append_closer(ndnb); /* </ContentObject> */
+}
+
+void
+sequence_number_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
+{
+  SequenceNumber sequenceNubmer(block);
+
+  ndn_charbuf_append_tt(ndnb, NDN_DTAG_SequenceNumber, NDN_DTAG);
+  ndn_charbuf_append_tt(ndnb, 2, NDN_BLOB);
+  ndn_charbuf_append_value(ndnb, sequenceNubmer.getSequenceNumber(), 2);
+  ndnb_element_end(ndnb);
 }
 
 void
@@ -116,7 +128,7 @@ name_to_ndnb(const Name &name, ndn_charbuf *ndnb)
       // Component
       ndnb_append_tagged_blob(ndnb, NDN_DTAG_Component, (i->value_size() > 0) ? i->value() : 0, i->value_size());
     }
-  
+
   ndn_charbuf_append_closer(ndnb); /* </Name> */
 }
 
@@ -124,7 +136,7 @@ inline void
 name_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
 {
   block.parse();
-  
+
   ndn_charbuf_append_tt(ndnb, NDN_DTAG_Name, NDN_DTAG);
   for (Block::element_const_iterator component = block.elements().begin ();
        component != block.elements().end ();
@@ -139,7 +151,7 @@ inline void
 selectors_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
 {
   block.parse();
-  
+
   // MinSuffixComponents
   Block::element_const_iterator val = block.find(Tlv::MinSuffixComponents);
   if (val != block.elements().end())
@@ -185,7 +197,7 @@ selectors_tlv_to_ndnb(const Block &block, ndn_charbuf *ndnb)
   else
     {
       // the default has been changed
-      
+
       ndn_charbuf_append_tt(ndnb, NDN_DTAG_AnswerOriginKind, NDN_DTAG);
       ndnb_append_number(ndnb, NDN_AOK_DEFAULT | NDN_AOK_STALE);
       ndn_charbuf_append_closer(ndnb); /* </AnswerOriginKind> */
@@ -235,7 +247,7 @@ signature_info_and_value_tlv_to_ndnb(const Block &info, const Block &value, ndn_
     break;
     // not anything that is not SignatureSha256WithRsa is not supported
   }
-  
+
   ndn_charbuf_append_closer(ndnb); /* </Signature> */
 }
 
@@ -246,7 +258,7 @@ meta_and_signature_info_tlv_to_ndnb(const Block &metaInfo, const Block &signatur
   signatureInfo.parse();
 
   static char fakePublisherPublicKeyDigest[32];
-  
+
   ndn_charbuf_append_tt(ndnb, NDN_DTAG_SignedInfo, NDN_DTAG);
 
   ////////////////////////////////////////////////
@@ -254,14 +266,14 @@ meta_and_signature_info_tlv_to_ndnb(const Block &metaInfo, const Block &signatur
   // NDNd requires PublisherPublicKeyDigest and Timestamp to be present in each Data packet
   // NDN-TLV does not have these fields, so simply add junk data
   //
-  
+
   // PublisherPublicKeyDigest (fake, required by CCNb)
   ndnb_append_tagged_blob(ndnb, NDN_DTAG_PublisherPublicKeyDigest, fakePublisherPublicKeyDigest, 32);
 
   // Timestamp
   const char fixedTimestamp[] = {149, 206, 184, 0, 0};
   ndnb_append_tagged_blob(ndnb, NDN_DTAG_Timestamp, fixedTimestamp, sizeof(fixedTimestamp));
-  
+
   // ContentType (aka Type)
   Block::element_const_iterator val = metaInfo.find(Tlv::ContentType);
   if (val != metaInfo.elements().end())
@@ -298,7 +310,7 @@ meta_and_signature_info_tlv_to_ndnb(const Block &metaInfo, const Block &signatur
     {
       Buffer::const_iterator begin = val->value_begin();
       uint64_t value = Tlv::readNonNegativeInteger(val->value_size(), begin, val->value_end()) / 1000;
-      ndnb_tagged_putf(ndnb, NDN_DTAG_FreshnessSeconds, "%d", (int)value);    
+      ndnb_tagged_putf(ndnb, NDN_DTAG_FreshnessSeconds, "%d", (int)value);
     }
 
   // FinalBlockID is optional and is not part of NDN-TLV
@@ -314,7 +326,7 @@ meta_and_signature_info_tlv_to_ndnb(const Block &metaInfo, const Block &signatur
         }
       // otherwise simply ignore, though it is an error
     }
-  
+
   // KeyLocator
   {
     SignatureSha256WithRsa signature(signatureInfo);
@@ -327,15 +339,15 @@ meta_and_signature_info_tlv_to_ndnb(const Block &metaInfo, const Block &signatur
         ndn_charbuf_append_tt(ndnb, NDN_DTAG_KeyName, NDN_DTAG);
 
         name_to_ndnb(signature.getKeyLocator().getName(), ndnb);
-        
+
         ndn_charbuf_append_closer(ndnb); /* </KeyName> */
-        ndn_charbuf_append_closer(ndnb); /* </KeyLocator> */  
+        ndn_charbuf_append_closer(ndnb); /* </KeyLocator> */
       }
   }
 
   // ExtOpt is optional and is not part of NDN-TLV
-  
-  ndn_charbuf_append_closer(ndnb); /* </SignedInfo> */  
+
+  ndn_charbuf_append_closer(ndnb); /* </SignedInfo> */
 }
 
 } // namespace ndn
