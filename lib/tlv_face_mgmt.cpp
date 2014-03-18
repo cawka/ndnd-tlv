@@ -96,7 +96,7 @@ tlv_face_instance_parse(const unsigned char *p, size_t size)
     ndn_charbuf_append(result->store, face.getMulticastInterface().c_str(), face.getMulticastInterface().size()+1);
   }
   result->descr.mcast_ttl = face.getMulticastTtl();
-  result->lifetime = face.getFreshnessPeriod() / 1000;
+  result->lifetime = time::duration_cast<time::seconds>(face.getFreshnessPeriod()).count();
   
   char *b = (char *)store->buf;
   result->action = (action_off == -1) ? NULL : b + action_off;
@@ -134,7 +134,7 @@ tlv_append_face_instance(struct ndn_charbuf *c,
     face.setMulticastTtl(fi->descr.mcast_ttl);
   }
   if (fi->lifetime >= 0) {
-    face.setFreshnessPeriod(fi->lifetime * 1000);
+    face.setFreshnessPeriod(time::seconds(fi->lifetime));
   }
 
   int res = ndn_charbuf_append(c, face.wireEncode().wire(), face.wireEncode().size());  

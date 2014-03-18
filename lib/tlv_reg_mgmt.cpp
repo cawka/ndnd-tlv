@@ -95,9 +95,9 @@ tlv_forwarding_entry_parse(const unsigned char *p, size_t size)
     result->flags |= Tlv::FaceManagement::FORW_CAPTURE_OK;
 
   // FreshnessPeriod
-  if (entry.getFreshnessPeriod() >= 0)
+  if (entry.getFreshnessPeriod() >= time::milliseconds::zero())
     {
-      result->lifetime = entry.getFreshnessPeriod() / 1000;
+      result->lifetime = time::duration_cast<time::seconds>(entry.getFreshnessPeriod()).count();
     }
   else
     {
@@ -143,7 +143,7 @@ tlv_append_forwarding_entry(struct ndn_charbuf *c,
     entry.setForwardingFlags(flags);
   }
   if (fe->lifetime >= 0) {
-    entry.setFreshnessPeriod(fe->lifetime * 1000);
+    entry.setFreshnessPeriod(time::seconds(fe->lifetime));
   }
 
   int res;

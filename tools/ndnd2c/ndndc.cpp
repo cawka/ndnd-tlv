@@ -64,7 +64,7 @@ Controller::Controller(Controller::OnReady onReady,
 {
   ;
   NdndIdFetcher fetcher(m_ndndid, onReady, onFailure);
-  m_face.expressInterest(Interest(Name("/%C1.M.S.localhost/%C1.M.SRV/ndnd/KEY"), 4000.0),
+  m_face.expressInterest(Interest(Name("/%C1.M.S.localhost/%C1.M.SRV/ndnd/KEY"), time::seconds(4)),
                          fetcher, fetcher);
   
 }
@@ -170,9 +170,9 @@ Controller::add(int check_only,
     std::string cmd_mcastif  = getNextToken(token, cmd_tokens);
 
     shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
-                                                                     cmd_mcastttl, cmd_mcastif, m_lifetime);
+                                                            cmd_mcastttl, cmd_mcastif, m_lifetime);
     shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry(cmd_uri,
-                                                                             cmd_flags, m_lifetime);
+                                                                    cmd_flags, m_lifetime);
     prefix->setAction("prefixreg");
     
     if (!check_only) {
@@ -218,9 +218,9 @@ Controller::del(int check_only,
     std::string cmd_mcastif  = getNextToken(token, cmd_tokens);
 
     shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
-                                                                     cmd_mcastttl, cmd_mcastif, m_lifetime);
+                                                            cmd_mcastttl, cmd_mcastif, m_lifetime);
     shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry(cmd_uri,
-                                                                             cmd_flags, m_lifetime);
+                                                                    cmd_flags, m_lifetime);
     prefix->setAction("unreg");
 
     if (!check_only) {
@@ -259,7 +259,7 @@ Controller::create(int check_only,
     std::string cmd_mcastif  = getNextToken(token, cmd_tokens);
 
     shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
-                                                                     cmd_mcastttl, cmd_mcastif, m_lifetime);
+                                                            cmd_mcastttl, cmd_mcastif, m_lifetime);
 
     if (!check_only) {
       face->setAction("newface");
@@ -292,7 +292,7 @@ Controller::destroy(int check_only,
     std::string cmd_mcastif  = getNextToken(token, cmd_tokens);
 
     shared_ptr<FaceInstance> face = parse_ndn_face_instance(cmd_proto, cmd_host, cmd_port,
-                                                                     cmd_mcastttl, cmd_mcastif, m_lifetime);
+                                                            cmd_mcastttl, cmd_mcastif, m_lifetime);
 
     if (!check_only) {
       face->setAction("destroyface");
@@ -433,8 +433,9 @@ Controller::parse_ndn_forwarding_entry(const std::string &cmd_uri,
       throw Error("command error, invalid flags" + cmd_flags);
     }
   }
-    
-  entry->setFreshnessPeriod(freshness);
+
+  if (freshness >= 0)
+    entry->setFreshnessPeriod(time::seconds(freshness));
   return (entry);
 }
 
@@ -494,7 +495,8 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
       throw Error("command error, face number invalid or out of range '" + cmd_host + "'");
     }
     entry->setFaceId(faceid);
-    entry->setFreshnessPeriod(freshness);
+    if (freshness >= 0)
+      entry->setFreshnessPeriod(time::seconds(freshness));
     return entry;
     
   } else {
@@ -559,8 +561,9 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
     
     entry->setMulticastInterface(rhostnamebuf);
   }
-    
-  entry->setFreshnessPeriod(freshness);
+
+  if (freshness >= 0)
+    entry->setFreshnessPeriod(time::seconds(freshness));
     
   return entry;
 }
@@ -703,7 +706,7 @@ Controller::startFaceAction(shared_ptr<FaceInstance> entry,
 
   Interest interest(interestName);
   interest.setScope(1);
-  interest.setInterestLifetime(1000);
+  interest.setInterestLifetime(time::seconds(1));
   interest.setMustBeFresh(true);
 
   m_face.expressInterest(interest,
@@ -735,7 +738,7 @@ Controller::startPrefixAction(shared_ptr<ForwardingEntry> entry,
 
   Interest interest(interestName);
   interest.setScope(1);
-  interest.setInterestLifetime(1000);
+  interest.setInterestLifetime(time::seconds(1));
   interest.setMustBeFresh(true);
 
   m_face.expressInterest(interest,

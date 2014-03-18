@@ -265,12 +265,10 @@ meta_info_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObject &
 
   // FreshnessPeriod
   if (co.offset[NDN_PCO_B_FreshnessSeconds] < co.offset[NDN_PCO_E_FreshnessSeconds]) {
-    uint64_t seconds = ndn_fetch_tagged_nonNegativeInteger(NDN_DTAG_FreshnessSeconds,
-                                                           buf,
-                                                           co.offset[NDN_PCO_B_FreshnessSeconds], co.offset[NDN_PCO_E_FreshnessSeconds]);
-    seconds *= 1000;
-
-    meta.setFreshnessPeriod(seconds);
+    uint64_t freshnessSeconds = ndn_fetch_tagged_nonNegativeInteger(NDN_DTAG_FreshnessSeconds,
+                                  buf,
+                                  co.offset[NDN_PCO_B_FreshnessSeconds], co.offset[NDN_PCO_E_FreshnessSeconds]);
+    meta.setFreshnessPeriod(time::seconds(freshnessSeconds));
   }
 
   

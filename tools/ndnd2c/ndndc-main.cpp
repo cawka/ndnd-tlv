@@ -127,7 +127,7 @@ public:
   int argc;
   char **argv;
 
-  ndn::ptr_lib::shared_ptr<ndn::ndndc::Controller> controller;
+  ndn::shared_ptr<ndn::ndndc::Controller> controller;
 };
 
 void
@@ -169,9 +169,9 @@ main(int argc, char **argv)
     return 1;
   }
 
-  p.controller = ndn::ptr_lib::make_shared<ndn::ndndc::Controller>(ndn::func_lib::bind(&Processor::Process, &p),
-                                                                   OnError,
-                                                                   p.lifetime);
+  p.controller = ndn::make_shared<ndn::ndndc::Controller>(ndn::bind(&Processor::Process, &p),
+                                                          OnError,
+                                                          p.lifetime);
 
   try {
     p.controller->getFace().processEvents();
