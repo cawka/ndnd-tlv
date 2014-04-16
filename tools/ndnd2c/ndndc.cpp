@@ -5,7 +5,7 @@
  * A NDNx program.
  *
  * Portions Copyright (C) 2013 Regents of the University of California.
- * 
+ *
  * Based on the CCNx C Library by PARC.
  * Copyright (C) 2009-2012 Palo Alto Research Center, Inc.
  *
@@ -66,7 +66,7 @@ Controller::Controller(Controller::OnReady onReady,
   NdndIdFetcher fetcher(m_ndndid, onReady, onFailure);
   m_face.expressInterest(Interest(Name("/%C1.M.S.localhost/%C1.M.SRV/ndnd/KEY"), time::seconds(4)),
                          fetcher, fetcher);
-  
+
 }
 
 Controller::~Controller()
@@ -174,7 +174,7 @@ Controller::add(int check_only,
     shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry(cmd_uri,
                                                                     cmd_flags, m_lifetime);
     prefix->setAction("prefixreg");
-    
+
     if (!check_only) {
       if (!boost::iequals(cmd_proto, "face")) {
         face->setAction("newface");
@@ -184,13 +184,13 @@ Controller::add(int check_only,
         add_or_del_step2(face, prefix);
       }
     }
-    
+
   }
   catch(std::exception &e) {
     std::cerr << "WARN: " << e.what() << std::endl;
     return -1;
   }
-    
+
   return 0;
 }
 
@@ -237,7 +237,7 @@ Controller::del(int check_only,
     std::cerr << "WARN: " << e.what() << std::endl;
     return -1;
   }
-  
+
   return 0;
 }
 
@@ -270,7 +270,7 @@ Controller::create(int check_only,
     std::cerr << "WARN: " << e.what() << std::endl;
     return -1;
   }
-  
+
   return 0;
 }
 
@@ -303,30 +303,30 @@ Controller::destroy(int check_only,
     std::cerr << "WARN: " << e.what() << std::endl;
     return -1;
   }
-  
+
   return 0;
-}    
+}
 
 int
 Controller::destroyface(int check_only,
                         const std::string &cmd)
 {
   int ret_code = 0;
-    
+
   if (cmd.empty()) {
     throw Error("command error");
   }
-    
+
   shared_ptr<FaceInstance> face = parse_ndn_face_instance_from_face(cmd);
   if (!static_cast<bool>(face)) {
     ret_code = -1;
   }
-    
+
   if (ret_code == 0 && check_only == 0) {
     face->setAction("destroyface");
     startFaceAction(face, NullFaceAction);
   }
-    
+
   return ret_code;
 }
 
@@ -335,7 +335,7 @@ int
 Controller::srv()
 {
   int res;
-    
+
   std::string host;
   int port_int = 0;
   std::string proto;
@@ -347,7 +347,7 @@ Controller::srv()
 
   shared_ptr<FaceInstance> face = parse_ndn_face_instance(proto, host, port, "", "", -1);
   shared_ptr<ForwardingEntry> prefix = parse_ndn_forwarding_entry("/", "", m_lifetime);
-    
+
   // crazy operation
   // First. "Create" face, which will do nothing if face already exists
   // Second. Destroy the face
@@ -400,7 +400,7 @@ Controller::parse_ndn_forwarding_entry(const std::string &cmd_uri,
   int res = 0;
 
   shared_ptr<ForwardingEntry> entry = make_shared<ForwardingEntry>();
-  
+
   /* we will be creating the face to either add/delete a prefix on it */
   if (cmd_uri.empty()) {
     throw Error("command error, missing NDNx URI\n");
@@ -412,7 +412,7 @@ Controller::parse_ndn_forwarding_entry(const std::string &cmd_uri,
   catch (const std::runtime_error &) {
     throw Error("command error, bad NDNx URI '"+cmd_uri+"'");
   }
-    
+
   if (!cmd_flags.empty()) {
     try {
       int flags = boost::lexical_cast<int>(cmd_flags);
@@ -457,7 +457,7 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
   hints.ai_addr=0;
   hints.ai_canonname=0;
   hints.ai_next=0;
-    
+
 
   struct addrinfo mcasthints;
   mcasthints.ai_flags = (AI_ADDRCONFIG | AI_NUMERICHOST);
@@ -478,7 +478,7 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
   int socktype;
 
   shared_ptr<FaceInstance> entry = make_shared<FaceInstance>();
-  
+
   if (cmd_proto.empty()) {
     throw Error("command error, missing address type");
   }
@@ -489,7 +489,7 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
     entry->setIpProto(IPPROTO_TCP);
     socktype = SOCK_STREAM;
   } else if (boost::iequals(cmd_proto, "face")) {
-    
+
     unsigned long faceid = boost::lexical_cast<unsigned long>(cmd_host);
     if (faceid > UINT_MAX || faceid == 0) {
       throw Error("command error, face number invalid or out of range '" + cmd_host + "'");
@@ -498,11 +498,11 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
     if (freshness >= 0)
       entry->setFreshnessPeriod(time::seconds(freshness));
     return entry;
-    
+
   } else {
     throw Error("command error, unrecognized address type '" + cmd_proto + "'");
   }
-    
+
   if (cmd_host.empty()) {
     throw Error("command error, missing hostname");
   }
@@ -510,7 +510,7 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
   std::string cmd_port_real= cmd_port;
   if (cmd_port.empty() || cmd_port[0] == 0)
     cmd_port_real = "6363";
-  
+
   hints.ai_socktype = socktype;
   res = getaddrinfo(cmd_host.c_str(), cmd_port_real.c_str(), &hints, &raddrinfo);
   if (res != 0 || raddrinfo == NULL) {
@@ -527,7 +527,7 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
 
   entry->setHost(rhostnamebuf);
   entry->setPort(rhostportbuf);
-    
+
   if (!cmd_mcastttl.empty()) {
     try {
       int ttl = boost::lexical_cast<int>(cmd_mcastttl);
@@ -537,19 +537,19 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
 
       entry->setMulticastTtl(ttl);
     }
-      
+
     catch(const boost::bad_lexical_cast &) {
       throw Error("command error, invalid multicast ttl: " + cmd_mcastttl);
     }
   }
-    
+
   if (!cmd_mcastif.empty()) {
     res = getaddrinfo(cmd_mcastif.c_str(), NULL, &mcasthints, &mcastifaddrinfo);
     if (res != 0) {
       throw Error("command error, incorrect multicat interface ["+cmd_mcastif+"]: "
                                 "mcastifaddr getaddrinfo: %s" +gai_strerror(res));
     }
-        
+
     res = getnameinfo(mcastifaddrinfo->ai_addr, mcastifaddrinfo->ai_addrlen,
                       rhostnamebuf, sizeof(rhostnamebuf),
                       NULL, 0,
@@ -558,13 +558,13 @@ Controller::parse_ndn_face_instance(const std::string &cmd_proto,
     if (res != 0) {
       throw Error(std::string("command error, getnameinfo: ") + gai_strerror(res));
     }
-    
+
     entry->setMulticastInterface(rhostnamebuf);
   }
 
   if (freshness >= 0)
     entry->setFreshnessPeriod(time::seconds(freshness));
-    
+
   return entry;
 }
 
@@ -572,7 +572,7 @@ shared_ptr<FaceInstance>
 Controller::parse_ndn_face_instance_from_face(const std::string &cmd_faceid)
 {
   shared_ptr<FaceInstance> entry = make_shared<FaceInstance>();
-    
+
   /* destroy a face - the URI field will hold the face number */
   if (cmd_faceid.empty()) {
     throw Error("command error, missing face number for destroyface");
@@ -588,7 +588,7 @@ Controller::parse_ndn_face_instance_from_face(const std::string &cmd_faceid)
   catch(const boost::bad_lexical_cast &) {
     throw Error("command error invalid face number for destroyface: " + cmd_faceid);
   }
-  
+
   return entry;
 }
 
@@ -607,7 +607,7 @@ onFaceActionSuccess(function< void (shared_ptr<FaceInstance>) > onSuccess,
     }
 
   Block::element_const_iterator val = content.elements().begin();
-  
+
   switch(val->type())
     {
     case Tlv::FaceManagement::FaceInstance:
@@ -623,7 +623,7 @@ onFaceActionSuccess(function< void (shared_ptr<FaceInstance>) > onSuccess,
         // failed :(
         StatusResponse resp;
         resp.wireDecode(*val);
-      
+
         throw Controller::Error("Local NDN forwarder reported error: " + boost::lexical_cast<std::string>(resp));
         return;
       }
@@ -647,7 +647,7 @@ onPrefixActionSuccess(function< void (shared_ptr<ForwardingEntry>) > onSuccess,
     }
 
   Block::element_const_iterator val = content.elements().begin();
-  
+
   switch(val->type())
     {
     case Tlv::FaceManagement::ForwardingEntry:
@@ -663,7 +663,7 @@ onPrefixActionSuccess(function< void (shared_ptr<ForwardingEntry>) > onSuccess,
         // failed :(
         StatusResponse resp;
         resp.wireDecode(*val);
-      
+
         throw Controller::Error("Local NDN forwarder reported error: " + boost::lexical_cast<std::string>(resp));
         return;
       }
@@ -690,7 +690,7 @@ Controller::startFaceAction(shared_ptr<FaceInstance> entry,
   Data data;
   data.setName(Name().appendVersion(random::generateWord32()));
   data.setContent(entry->wireEncode());
-  
+
   // Create an empty signature, since nobody going to verify it for now
   // @todo In the future, we may require real signatures to do the registration
   SignatureSha256WithRsa signature;
@@ -700,7 +700,7 @@ Controller::startFaceAction(shared_ptr<FaceInstance> entry,
   // Create an interest where the name has the encoded Data packet.
   Name interestName;
   interestName.append("ndnx");
-  interestName.append(m_ndndid);
+  interestName.append(name::Component(m_ndndid));
   interestName.append(entry->getAction());
   interestName.append(data.wireEncode());
 
@@ -722,7 +722,7 @@ Controller::startPrefixAction(shared_ptr<ForwardingEntry> entry,
   Data data;
   data.setName(Name().appendVersion(random::generateWord32()));
   data.setContent(entry->wireEncode());
-  
+
   // Create an empty signature, since nobody going to verify it for now
   // @todo In the future, we may require real signatures to do the registration
   SignatureSha256WithRsa signature;
@@ -732,7 +732,7 @@ Controller::startPrefixAction(shared_ptr<ForwardingEntry> entry,
   // Create an interest where the name has the encoded Data packet.
   Name interestName;
   interestName.append("ndnx");
-  interestName.append(m_ndndid);
+  interestName.append(name::Component(m_ndndid));
   interestName.append(entry->getAction());
   interestName.append(data.wireEncode());
 
