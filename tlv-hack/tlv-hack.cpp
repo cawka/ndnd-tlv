@@ -65,9 +65,6 @@ tlv_to_ndnb(const unsigned char *buf, size_t length, struct ndn_charbuf *ndnb)
   catch (Tlv::Error &error) {
     // do nothing
   }
-  catch (Block::Error &error) {
-    // do nothing
-  }
   catch (Signature::Error &error) {
     // do nothing
   }
