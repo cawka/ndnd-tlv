@@ -7,11 +7,11 @@
  * Author: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
  */
 
-#ifndef NDN_NDNB_2_TLV_HPP
-#define NDN_NDNB_2_TLV_HPP
+#ifndef NDN_TLV_TO_NDNB_HPP
+#define NDN_TLV_TO_NDNB_HPP
 
-#include <ndn-cpp-dev/encoding/block.hpp>
-#include <ndn-cpp-dev/name.hpp>
+#include <ndn-cxx/encoding/block.hpp>
+#include <ndn-cxx/name.hpp>
 
 extern "C" {
 struct ndn_charbuf;
@@ -50,4 +50,4 @@ meta_and_signature_info_tlv_to_ndnb(const Block &meta, const Block &signature, n
 
 }
 
-#endif // NDN_NDNB_2_TLV_HPP
+#endif // NDN_TLV_TO_NDNB

@@ -7,7 +7,7 @@
 #ifndef TLV_HACK_SEQUENCE_NUMBER_HPP
 #define TLV_HACK_SEQUENCE_NUMBER_HPP
 
-#include <ndn-cpp-dev/encoding/encoding-buffer.hpp>
+#include <ndn-cxx/encoding/encoding-buffer.hpp>
 
 namespace ndn {
 
@@ -44,13 +44,13 @@ public:
   template<bool T>
   size_t
   wireEncode(EncodingImpl<T> &block) const;
-  
+
   const Block&
   wireEncode () const;
-  
-  void 
+
+  void
   wireDecode (const Block &wire);
-  
+
 private:
   uint64_t m_sequenceNumber;
 
@@ -64,7 +64,7 @@ SequenceNumber::wireEncode(EncodingImpl<T>& blk) const
 {
   // SequenceNumber ::= SEQUENCE-NUMBER-TYPE TLV-LENGTH
   //                      nonNegativeInteger
-  
+
   size_t total_len = 0;
 
   total_len += blk.prependNonNegativeInteger(m_sequenceNumber);
@@ -81,7 +81,7 @@ SequenceNumber::wireEncode () const
 
   EncodingEstimator estimator;
   size_t estimatedSize = wireEncode(estimator);
-  
+
   EncodingBuffer buffer(estimatedSize, 0);
   wireEncode(buffer);
 
@@ -89,14 +89,14 @@ SequenceNumber::wireEncode () const
   return m_wire;
 }
 
-inline void 
+inline void
 SequenceNumber::wireDecode (const Block &wire)
 {
   m_wire = wire;
 
   if (m_wire.type() != TlvType)
     throw Error("Requested decoding of SequenceNumber, but Block is of different type");
-  
+
   m_wire.parse ();
 
   m_sequenceNumber = readNonNegativeInteger(m_wire);

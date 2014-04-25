@@ -5,7 +5,7 @@
  * A NDNx program.
  *
  * Portions Copyright (C) 2013 Regents of the University of California.
- * 
+ *
  * Based on the CCNx C Library by PARC.
  * Copyright (C) 2009-2012 Palo Alto Research Center, Inc.
  *
@@ -24,11 +24,11 @@
 #ifndef NDNDC_HPP
 #define NDNDC_HPP
 
-#include <ndn-cpp-dev/face.hpp>
+#include <ndn-cxx/face.hpp>
 
-#include <ndn-cpp-dev/management/ndnd-forwarding-entry.hpp>
-#include <ndn-cpp-dev/management/ndnd-status-response.hpp>
-#include <ndn-cpp-dev/management/ndnd-face-instance.hpp>
+#include <ndn-cxx/management/ndnd-forwarding-entry.hpp>
+#include <ndn-cxx/management/ndnd-status-response.hpp>
+#include <ndn-cxx/management/ndnd-face-instance.hpp>
 
 namespace ndn {
 namespace ndndc {
@@ -48,10 +48,10 @@ public:
 
   typedef function<void(void)> OnReady;
   typedef function<void(void)> OnFailure;
-  
+
   Controller(OnReady onReady, OnFailure onFailure, int lifetime = -1);
   ~Controller();
- 
+
   /**
    * @brief Select a correct command based on the supplied argument
    * @param check_only    flag indicating that only command checking is requested (no messages are exchanged with ndnd)
@@ -166,7 +166,7 @@ public:
   {
     return m_face;
   }
-  
+
 private:
   void
   startFaceAction(shared_ptr<FaceInstance> entry,
@@ -175,7 +175,7 @@ private:
   void
   startPrefixAction(shared_ptr<ForwardingEntry> entry,
                     function< void (shared_ptr<ForwardingEntry>) > onSuccess);
-  
+
 
   //
   void
@@ -184,13 +184,13 @@ private:
   //
   void
   srv_step2(shared_ptr<FaceInstance> face, shared_ptr<ForwardingEntry> prefix);
-  
+
   void
   srv_step3(shared_ptr<FaceInstance> face, shared_ptr<ForwardingEntry> prefix);
-  
+
   void
   srv_step4(shared_ptr<FaceInstance> face, shared_ptr<ForwardingEntry> prefix);
-  
+
   // int
   // do_prefix_action(const std::string &action,
   //                  struct ndn_forwarding_entry *forwarding_entry);
@@ -199,7 +199,7 @@ private:
   parse_ndn_forwarding_entry(const std::string &cmd_uri,
                              const std::string &cmd_flags,
                              int freshness);
-  
+
   shared_ptr<FaceInstance>
   parse_ndn_face_instance(const std::string &cmd_proto,
                           const std::string &cmd_host,     const std::string &cmd_port,
@@ -208,10 +208,10 @@ private:
 
   shared_ptr<FaceInstance>
   parse_ndn_face_instance_from_face(const std::string &cmd_faceid);
-  
+
 private:
   Buffer m_ndndid;
-  
+
   Face m_face;
   int  m_lifetime;
   // struct ndn_charbuf  *no_name;   // an empty name

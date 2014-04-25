@@ -35,9 +35,9 @@ extern "C" {
 #undef ndn
 }
 
-#include <ndn-cpp-dev/encoding/tlv.hpp>
-#include <ndn-cpp-dev/management/ndnd-forwarding-entry.hpp>
-#include <ndn-cpp-dev/management/ndnd-status-response.hpp>
+#include <ndn-cxx/encoding/tlv.hpp>
+#include <ndn-cxx/management/ndnd-forwarding-entry.hpp>
+#include <ndn-cxx/management/ndnd-status-response.hpp>
 
 #include "../tlv-hack/tlv-to-ndnb.hpp"
 #include "../tlv-hack/ndnb-to-tlv.hpp"
@@ -103,7 +103,7 @@ tlv_forwarding_entry_parse(const unsigned char *p, size_t size)
     {
       result->lifetime = -1;
     }
-  
+
   return(result);
 }
 

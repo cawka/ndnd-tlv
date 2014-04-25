@@ -20,9 +20,9 @@ extern "C" {
 
 #include "tlv-hack.h"
 
-#include <ndn-cpp-dev/encoding/tlv.hpp>
-#include <ndn-cpp-dev/management/ndnd-status-response.hpp>
-#include <ndn-cpp-dev/data.hpp>
+#include <ndn-cxx/encoding/tlv.hpp>
+#include <ndn-cxx/management/ndnd-status-response.hpp>
+#include <ndn-cxx/data.hpp>
 
 #include "tlv-to-ndnb.hpp"
 #include "ndnb-to-tlv.hpp"

@@ -21,7 +21,7 @@ extern "C" {
 
 #include "tlv-to-ndnb.hpp"
 #include "sequence-number.hpp"
-#include <ndn-cpp-dev/security/signature-sha256-with-rsa.hpp>
+#include <ndn-cxx/security/signature-sha256-with-rsa.hpp>
 
 namespace ndn {
 

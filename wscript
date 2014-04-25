@@ -15,7 +15,7 @@ def options(opt):
                    help='''Enable C++11 compiler features''')
     opt.add_option('--with-tests', action='store_true',default=False,dest='with_tests',
                    help='''build unit tests''')
-    
+
 def configure(conf):
     conf.load("compiler_c compiler_cxx gnu_dirs ndnx boost")
 
@@ -23,7 +23,7 @@ def configure(conf):
 
     if conf.options.with_tests:
         conf.env['WITH_TESTS'] = True
-    
+
     if conf.options.debug:
         conf.define ('_DEBUG', 1)
         flags = ['-O0',
@@ -54,8 +54,8 @@ def configure(conf):
     conf.check_ndnx()
     conf.check_openssl()
 
-    conf.check_cfg(package='libndn-cpp-dev', args=['--cflags', '--libs'], uselib_store='NDN_CPP', mandatory=True)
-        
+    conf.check_cfg(package='libndn-cxx', args=['--cflags', '--libs'], uselib_store='NDN_CPP', mandatory=True)
+
     conf.check_cxx(lib='resolv',  uselib_store='RESOLV',  mandatory=True)
     conf.check_cxx(lib='dl', uselib_store='DL', mandatory=False)
 
@@ -65,7 +65,7 @@ def configure(conf):
     conf.check_boost(lib=USED_BOOST_LIBS)
 
     conf.load("coverage")
-    
+
 def build (bld):
     bld (target = 'ndn-tlv',
          name = 'ndn-tlv',
@@ -105,12 +105,12 @@ def build (bld):
          chmod = 0755,
         )
 
-    bld.install_files(bld.env['INCLUDEDIR'], bld.path.ant_glob(['include/**/*.h']), 
+    bld.install_files(bld.env['INCLUDEDIR'], bld.path.ant_glob(['include/**/*.h']),
                       relative_trick=True, cwd=bld.path.find_node('include'))
-    
-    bld.install_files('%s/ndn-tlv' % bld.env['INCLUDEDIR'], bld.path.ant_glob(['tlv-hack/**/*.h', 'tlv-hack/**/*.hpp']), 
+
+    bld.install_files('%s/ndn-tlv' % bld.env['INCLUDEDIR'], bld.path.ant_glob(['tlv-hack/**/*.h', 'tlv-hack/**/*.hpp']),
                       relative_trick=True, cwd=bld.path.find_node('tlv-hack'))
-    
+
     # Unit tests
     if bld.env['WITH_TESTS']:
         bld.recurse('tests')

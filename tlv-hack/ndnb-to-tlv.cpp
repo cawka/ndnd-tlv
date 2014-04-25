@@ -20,8 +20,8 @@ extern "C" {
 }
 
 #include "ndnb-to-tlv.hpp"
-#include <ndn-cpp-dev/name-component.hpp>
-#include <ndn-cpp-dev/meta-info.hpp>
+#include <ndn-cxx/name-component.hpp>
+#include <ndn-cxx/meta-info.hpp>
 
 namespace ndn {
 
@@ -29,7 +29,7 @@ Block
 interest_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi, const ndn_indexbuf &comps)
 {
   Block interest(Tlv::Interest);
-  
+
   // Name
   interest.push_back(name_ndnb_to_tlv(buf, comps));
 
@@ -112,7 +112,7 @@ data_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObject &co, c
   // "Signature"
   // SignatureInfo
   data.push_back(signature_info_ndnb_to_tlv(buf, co));
-  
+
   // SignatureValue
   {
     const unsigned char *signatureValue;
@@ -228,10 +228,10 @@ exclude_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi)
     size_t size;
     ndn_buf_match_blob(d, &comp, &size);
     ndn_buf_check_close(d);
-    
+
     exclude.push_back
       (dataBlock(Tlv::NameComponent, comp, size));
-    
+
     r = ndn_buf_match_dtag(d, NDN_DTAG_Any);
     if (r > 0) {
       ndn_buf_advance(d);
@@ -242,7 +242,7 @@ exclude_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_interest &pi)
     }
   }
   ndn_buf_check_close(d);
-  
+
   exclude.encode();
   return exclude;
 }
@@ -271,7 +271,7 @@ meta_info_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObject &
     meta.setFreshnessPeriod(time::seconds(freshnessSeconds));
   }
 
-  
+
   // FinalBlockId
   if (co.offset[NDN_PCO_B_FinalBlockID] != co.offset[NDN_PCO_E_FinalBlockID]) {
     const unsigned char *finalid = NULL;
@@ -297,26 +297,26 @@ signature_info_ndnb_to_tlv(const unsigned char *buf, const ndn_parsed_ContentObj
   {
     info.push_back(nonNegativeIntegerBlock(Tlv::SignatureType, Tlv::SignatureSha256WithRsa));
   }
-  
+
   // KeyLocator
   {
     Block keyLocator(Tlv::KeyLocator);
     if (co.offset[NDN_PCO_B_KeyName_Name] < co.offset[NDN_PCO_E_KeyName_Name]) {
       size_t length = co.offset[NDN_PCO_E_KeyName_Name] - co.offset[NDN_PCO_B_KeyName_Name];
-      
+
       ndn_indexbuf *indexbuf = ndn_indexbuf_create();
       const ndn_charbuf namebuf = { length, length, const_cast<unsigned char *> (buf + co.offset[NDN_PCO_B_KeyName_Name]) };
       ndn_name_split (&namebuf, indexbuf);
 
       keyLocator.push_back(name_ndnb_to_tlv(buf + co.offset[NDN_PCO_B_KeyName_Name], *indexbuf));
-      
+
       ndn_indexbuf_destroy(&indexbuf);
     }
 
     keyLocator.encode();
     info.push_back(keyLocator);
   }
-  
+
   info.encode();
   return info;
 }

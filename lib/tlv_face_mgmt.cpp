@@ -1,11 +1,11 @@
 /**
  * @file ndn_face_mgmt.c
  * @brief Support for parsing and creating FaceInstance elements.
- * 
+ *
  * Part of the NDNx C Library.
  *
  * Portions Copyright (C) 2013 Regents of the University of California.
- * 
+ *
  * Based on the CCNx C Library by PARC.
  * Copyright (C) 2009 Palo Alto Research Center, Inc.
  *
@@ -35,9 +35,9 @@ extern "C" {
 #undef ndn
 }
 
-#include <ndn-cpp-dev/encoding/tlv.hpp>
-#include <ndn-cpp-dev/management/ndnd-face-instance.hpp>
-#include <ndn-cpp-dev/management/ndnd-status-response.hpp>
+#include <ndn-cxx/encoding/tlv.hpp>
+#include <ndn-cxx/management/ndnd-face-instance.hpp>
+#include <ndn-cxx/management/ndnd-status-response.hpp>
 
 #include "../tlv-hack/tlv-to-ndnb.hpp"
 #include "../tlv-hack/ndnb-to-tlv.hpp"
@@ -56,7 +56,7 @@ tlv_face_instance_parse(const unsigned char *p, size_t size)
 {
   FaceInstance face;
   face.wireDecode(Block(p, size));
-  
+
   struct ndn_face_instance *result;
   // const unsigned char *val;
   // size_t sz;
@@ -65,7 +65,7 @@ tlv_face_instance_parse(const unsigned char *p, size_t size)
   int host_off = -1;
   int port_off = -1;
   int mcast_off = -1;
-    
+
   struct ndn_charbuf *store = ndn_charbuf_create();
   if (store == NULL)
     return(NULL);
@@ -97,13 +97,13 @@ tlv_face_instance_parse(const unsigned char *p, size_t size)
   }
   result->descr.mcast_ttl = face.getMulticastTtl();
   result->lifetime = time::duration_cast<time::seconds>(face.getFreshnessPeriod()).count();
-  
+
   char *b = (char *)store->buf;
   result->action = (action_off == -1) ? NULL : b + action_off;
   result->descr.address = (host_off == -1) ? NULL : b + host_off;
   result->descr.port = (port_off == -1) ? NULL : b + port_off;
   result->descr.source_address = (mcast_off == -1) ? NULL : b + mcast_off;
-  
+
   return(result);
 }
 
@@ -137,7 +137,7 @@ tlv_append_face_instance(struct ndn_charbuf *c,
     face.setFreshnessPeriod(time::seconds(fi->lifetime));
   }
 
-  int res = ndn_charbuf_append(c, face.wireEncode().wire(), face.wireEncode().size());  
+  int res = ndn_charbuf_append(c, face.wireEncode().wire(), face.wireEncode().size());
   return(res);
 }
 

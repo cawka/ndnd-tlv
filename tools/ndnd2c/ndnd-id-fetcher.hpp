@@ -7,8 +7,8 @@
 #ifndef NDN_NDND_ID_FETCHER_HPP
 #define NDN_NDND_ID_FETCHER_HPP
 
-#include <ndn-cpp-dev/common.hpp>
-#include <ndn-cpp-dev/util/crypto.hpp>
+#include <ndn-cxx/common.hpp>
+#include <ndn-cxx/util/crypto.hpp>
 
 namespace ndn {
 
@@ -20,8 +20,8 @@ class NdndIdFetcher {
 public:
   typedef func_lib::function<void (void)> OnSuccess;
   typedef func_lib::function<void (void)> OnFailure;
-  
-  
+
+
   class Info;
   NdndIdFetcher(Buffer &ndndId, const OnSuccess& onSuccess, const OnFailure& onFailure)
     : ndndId_(ndndId)
@@ -29,20 +29,20 @@ public:
     , onFailure_(onFailure)
   {
   }
-    
+
   /**
    * We received the ndnd ID.
    * @param interest
    * @param data
    */
-  inline void 
+  inline void
   operator()(const Interest& interest, Data& ndndIdData);
 
   /**
    * We timed out fetching the ndnd ID.
    * @param interest
    */
-  inline void 
+  inline void
   operator()(const Interest& timedOutInterest);
 
 private:
@@ -51,7 +51,7 @@ private:
   OnFailure onFailure_;
 };
 
-void 
+void
 NdndIdFetcher::operator()(const Interest& interest, Data& ndndIdData)
 {
   if (ndndIdData.getSignature().getType() == Signature::Sha256WithRsa)
@@ -64,7 +64,7 @@ NdndIdFetcher::operator()(const Interest& interest, Data& ndndIdData)
     onFailure_();
 }
 
-void 
+void
 NdndIdFetcher::operator()(const Interest& timedOutInterest)
 {
   onFailure_();
